@@ -435,18 +435,14 @@ if __name__ == '__main__':
     # 이메일 전송 모드인지 확인
     send_email_mode = "--send-email" in sys.argv
 
-    SENDER_EMAIL = os.getenv('SENDER_EMAIL', 'parkib63@gmai.com') 
+    SENDER_EMAIL = os.getenv('SENDER_EMAIL', 'parkib63@gmail.com') 
     SENDER_PASSWORD = os.getenv('SENDER_PASSWORD', 'bdnj dicf dzea wdrq') 
-    RECEIVER_EMAIL = os.getenv('RECEIVER_EMAIL', 'parkib63@naver.com')
-    STREAMLIT_APP_URL = os.getenv('STREAMLIT_APP_URL', 'https://your-deployed-streamlit-app-url.com')
+    RECEIVER_EMAIL = os.getenv('RECEIVER_EMAIL', 'parkib63@naver.com') 
+    STREAMLIT_APP_URL = os.getenv('STREAMLIT_APP_URL', 'https://app-stock-app-bomipark.streamlit.app/')
 
 
     if send_email_mode:
         print("🚀 이메일 보고서 전송 모드로 시작합니다...")
-        if SENDER_EMAIL == 'your_email@gmail.com' or SENDER_PASSWORD == 'your_email_app_password' or STREAMLIT_APP_URL == 'https://your-deployed-streamlit-app-url.com': # 변경됨: STREAMLIT_APP_URL 조건 추가
-            print("🚨 경고: 이메일 발신자 정보 또는 Streamlit 앱 URL이 설정되지 않았습니다. 환경 변수를 확인하거나 코드 내 값을 변경하세요.")
-            sys.exit(1)
-
         email_summary_rows = []
         email_tech_summaries_text = []
         # email_attachments = [] # 변경됨: 첨부 파일 사용 안 하므로 주석 처리 또는 삭제
