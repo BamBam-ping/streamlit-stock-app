@@ -65,6 +65,8 @@ def download_macro_data(start, end):
         except Exception as e:
             retrieved_data[name] = np.nan
             print(f"ERROR: Failed to download {name} ({ticker_symbol}). Reason: {e}. Setting to NaN.")
+    
+    return retrieved_data # 수정된 딕셔너리 반환
 
 def macro_filter(macro_data):
     """거시경제 지표에 따라 시장 상태를 분류합니다."""
