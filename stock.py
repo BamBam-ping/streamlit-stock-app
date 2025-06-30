@@ -7,7 +7,7 @@ import numpy as np
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from email.mime.application import MIMEApplication
+from email.mime.application import MIMEApplication # 첨부 파일 기능 복원
 import os
 import sys
 
@@ -419,7 +419,6 @@ def send_email(subject, body, to_email, from_email, password, attachments=None):
                 print(f"경고: 첨부 파일 {file_path} 처리 중 오류 발생: {e}. 스킵합니다.")
 
     try:
-
         server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
         server.login(from_email, password)
         server.send_message(msg)
@@ -439,6 +438,7 @@ if __name__ == '__main__':
     SENDER_PASSWORD = os.getenv('SENDER_PASSWORD', 'bdnj dicf dzea wdrq') 
     RECEIVER_EMAIL = os.getenv('RECEIVER_EMAIL', 'parkib63@naver.com') 
     STREAMLIT_APP_URL = os.getenv('STREAMLIT_APP_URL', 'https://app-stock-app-bomipark.streamlit.app/')
+
 
 
     if send_email_mode:
@@ -538,8 +538,6 @@ if __name__ == '__main__':
 <h3>🧠 AI에게 물어보는 기술적 분석 프롬프트</h3>
 <p>아래 각 종목의 기술적 지표만 보고, 미국 주식 전문 트레이더처럼 매수/매도/익절/보유/관망 시그널과 매수/매도/익절이 필요한 경우 “몇 % 정도” 하면 좋을지도 같이 구체적으로 알려줘.</p>
 <p>- 한 종목당 한 줄씩,<br>- 신호와 추천 비율(%)만 간단명료하게<br>- 사유도 한 줄로 덧붙여줘.</p>
-<p><b>[질문]</b></p>
-<p>- 각 종목별로<br>  1) 매수/매도/익절/보유/관망 중 뭐가 적합한지<br>  2) 추천 비율(%)은 얼마나 할지 (예: “익절 30%” “신규매수 50%” 등)<br>  3) 근거 한 줄</p>
 <p>아래 표로 정리해서 답변해줘.</p>
 <pre><code>| 종목 | 추천액션 | 비율(%) | 근거 요약 |
 |------|----------------|---------|-----------------------------|
@@ -551,7 +549,8 @@ if __name__ == '__main__':
 
         # 이메일 전송
         EMAIL_SUBJECT = f"미국 주식 시그널 대시보드 - {datetime.now().strftime('%Y-%m-%d')}"
-        send_email(EMAIL_SUBJECT, final_email_body, RECEIVER_EMAIL, SENDER_EMAIL, SENDER_PASSWORD)
+        email_attachments = [] # 이메일 첨부 기능 복원되었으므로 초기화
+        send_email(EMAIL_SUBJECT, final_email_body, RECEIVER_EMAIL, SENDER_EMAIL, SENDER_PASSWORD, attachments=email_attachments)
 
 
     else:
@@ -581,7 +580,6 @@ if __name__ == '__main__':
         all_tech_summaries_text = []
 
         for ticker in TICKERS:
-            st.markdown(f"### {ticker}")
             try:
                 ticker_obj = yf.Ticker(ticker)
                 data = ticker_obj.history(start=START_DATE, end=END_DATE, interval="1d")
@@ -619,7 +617,8 @@ if __name__ == '__main__':
                 score = adjust_score(score, market_condition) # 거시경제에 따른 점수 조정
                 action, pct = get_action_and_percentage_by_score(signal, score)
 
-                st.write(f"**현재 시그널**: **{signal}**")
+          
+                st.subheader(f"💰 {ticker} 시그널: **{signal}** (오늘 종가: **${last['Close']:.2f}**)") 
                 st.write(f"**추천 행동**: **{action} ({pct}%)**")
                 st.write(f"**추천 점수**: **{score:.1f}/100**")
 
@@ -677,7 +676,7 @@ if __name__ == '__main__':
         # 변경된 AI 프롬프트 부분
         if all_tech_summaries_text:
             st.subheader("🧠 AI에게 물어보는 기술적 분석 프롬프트")
-
+            
             ai_prompt_template = """
 아래 각 종목의 기술적 지표만 보고, 
 미국 주식 전문 트레이더처럼 매수/매도/익절/보유/관망 시그널과 
@@ -697,11 +696,8 @@ if __name__ == '__main__':
 
 | 종목 | 추천액션       | 비율(%) | 근거 요약                   |
 |------|----------------|---------|-----------------------------|
-
-
 """
-
-    
+            
             full_ai_prompt_content = ai_prompt_template + "\n" + "\n".join(all_tech_summaries_text)
 
             st.code(full_ai_prompt_content, language='markdown', line_numbers=False)
