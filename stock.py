@@ -445,7 +445,7 @@ if __name__ == '__main__':
         print("🚀 이메일 보고서 전송 모드로 시작합니다...")
         email_summary_rows = []
         email_tech_summaries_text = []
-        # email_attachments = [] # 변경됨: 첨부 파일 사용 안 하므로 주석 처리 또는 삭제
+
 
         macro_start_date = (datetime.now() - timedelta(days=60)).strftime("%Y-%m-%d")
         macro_data = download_macro_data(macro_start_date, END_DATE)
@@ -532,7 +532,6 @@ if __name__ == '__main__':
                 fig.update_layout(title=f'{ticker} 캔들스틱 차트', xaxis_rangeslider_visible=False)
                 chart_image_path = f"{ticker}_candlestick_chart.png"
                 fig.write_image(chart_image_path, width=800, height=400) # 이미지 해상도 설정
-                email_attachments.append((chart_image_path, f"{ticker}_캔들스틱.png"))
 
             except ValueError as ve:
                 print(f"❌ {ticker} 지표 계산 중 오류 발생: {ve}. 스킵합니다.")
