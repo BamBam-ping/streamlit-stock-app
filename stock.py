@@ -53,7 +53,8 @@ def download_macro_data(start, end):
         try:
             print(f"DEBUG: Attempting to download {name} ({ticker_symbol}) data...")
             ticker_obj = yf.Ticker(ticker_symbol)
-            data = ticker_obj.history(start=start, end=end, progress=False)
+            # progress=False 인자를 제거했습니다.
+            data = ticker_obj.history(start=start, end=end) 
             
             if not data.empty and not data['Close'].dropna().empty:
                 value = data['Close'].dropna().iloc[-1].item()
@@ -66,10 +67,15 @@ def download_macro_data(start, end):
             retrieved_data[name] = np.nan
             print(f"ERROR: Failed to download {name} ({ticker_symbol}). Reason: {e}. Setting to NaN.")
     
-    return retrieved_data # 수정된 딕셔너리 반환
+    return retrieved_data # 딕셔너리가 항상 반환되도록 보장
 
 def macro_filter(macro_data):
     """거시경제 지표에 따라 시장 상태를 분류합니다."""
+    # macro_data가 None일 가능성에 대비하여 초기화하는 안전장치 코드를 제거했습니다.
+    # download_macro_data가 항상 딕셔너리를 반환하도록 수정되었으므로,
+    # macro_data는 항상 dict 타입이며, get() 메서드를 사용할 수 있습니다.
+    # 값이 NaN이면 np.isnan()으로 체크하여 N/A로 표시됩니다.
+
     vix_val = macro_data.get("VIX", np.nan)
     us10y_val = macro_data.get("US10Y", np.nan)
 
@@ -456,7 +462,6 @@ if __name__ == '__main__':
     STREAMLIT_APP_URL = os.getenv('STREAMLIT_APP_URL', 'https://app-stock-app-bomipark.streamlit.app/')
 
 
-
     if send_email_mode:
         print("🚀 이메일 보고서 전송 모드로 시작합니다...")
         email_summary_rows = []
@@ -552,7 +557,9 @@ if __name__ == '__main__':
             ai_prompt_template = """
 <br>
 <h3>🧠 AI에게 물어보는 기술적 분석 프롬프트</h3>
-<p>아래 각 종목의 기술적 지표만 보고, 미국 주식 전문 트레이더처럼 매수/매도/익절/보유/관망 시그널과 매수/매도/익절이 필요한 경우 “몇 % 정도” 하면 좋을지도 같이 구체적으로 알려줘.</p>
+<p>아래 각 종목의 기술적 지표만 보고, 
+미국 주식 전문 트레이더처럼 매수/매도/익절/보유/관망 시그널과 
+매수/매도/익절이 필요한 경우 “몇 % 정도” 하면 좋을지도 같이 구체적으로 알려줘.</p>
 <p>- 한 종목당 한 줄씩,<br>- 신호와 추천 비율(%)만 간단명료하게<br>- 사유도 한 줄로 덧붙여줘.</p>
 <p>아래 표로 정리해서 답변해줘.</p>
 <pre><code>| 종목 | 추천액션 | 비율(%) | 근거 요약 |
@@ -596,6 +603,7 @@ if __name__ == '__main__':
         all_tech_summaries_text = []
 
         for ticker in TICKERS:
+            # st.markdown(f"### {ticker}") # 이 줄을 제거하여 티커 중복 표시 방지
             try:
                 ticker_obj = yf.Ticker(ticker)
                 data = ticker_obj.history(start=START_DATE, end=END_DATE, interval="1d")
@@ -633,8 +641,8 @@ if __name__ == '__main__':
                 score = adjust_score(score, market_condition) # 거시경제에 따른 점수 조정
                 action, pct = get_action_and_percentage_by_score(signal, score)
 
-          
-                st.subheader(f"💰 {ticker} 시그널: **{signal}** (오늘 종가: **${last['Close']:.2f}**)") 
+                # 각 종목별 가장 최근 종가를 여기에 표시합니다.
+                st.subheader(f"📊 {ticker} 시그널: **{signal}** (오늘 종가: **${last['Close']:.2f}**)")
                 st.write(f"**추천 행동**: **{action} ({pct}%)**")
                 st.write(f"**추천 점수**: **{score:.1f}/100**")
 
@@ -710,7 +718,7 @@ if __name__ == '__main__':
 
 아래 표로 정리해서 답변해줘.
 
-| 종목 | 추천액션       | 비율(%) | 근거 요약                   |
+| 종목 | 추천액션 | 비율(%) | 근거 요약 |
 |------|----------------|---------|-----------------------------|
 """
             
