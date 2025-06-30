@@ -46,11 +46,25 @@ MIN_DATA_REQUIRED_FOR_INDICATORS = 180 # 지표 계산에 필요한 최소 일�
 @st.cache_data
 def download_macro_data(start, end):
     """VIX와 10년 국채 금리 데이터를 다운로드합니다."""
-    macro_tickers = ["^VIX", "^TNX"] # TNX는 10년 국채 금리 티커
-    data = yf.download(macro_tickers, start=start, end=end, progress=False)
-    vix = data['Close']['^VIX'].iloc[-1] if '^VIX' in data['Close'].columns else np.nan
-    us10y = data['Close']['^TNX'].iloc[-1] if '^TNX' in data['Close'].columns else np.nan
-    return {"VIX": vix, "US10Y": us10y}
+    macro_tickers = {"VIX": "^VIX", "US10Y": "^TNX"} # TNX는 10년 국채 금리 티커
+    retrieved_data = {} # 반환할 딕셔너리
+    
+    for name, ticker_symbol in macro_tickers.items():
+        try:
+            print(f"DEBUG: Attempting to download {name} ({ticker_symbol}) data...")
+            ticker_obj = yf.Ticker(ticker_symbol)
+            data = ticker_obj.history(start=start, end=end, progress=False)
+            
+            if not data.empty and not data['Close'].dropna().empty:
+                value = data['Close'].dropna().iloc[-1].item()
+                retrieved_data[name] = value
+                print(f"DEBUG: Successfully retrieved {name}: {value}")
+            else:
+                retrieved_data[name] = np.nan
+                print(f"DEBUG: {name} data is empty or 'Close' column is NaN. Setting to NaN.")
+        except Exception as e:
+            retrieved_data[name] = np.nan
+            print(f"ERROR: Failed to download {name} ({ticker_symbol}). Reason: {e}. Setting to NaN.")
 
 def macro_filter(macro_data):
     """거시경제 지표에 따라 시장 상태를 분류합니다."""
