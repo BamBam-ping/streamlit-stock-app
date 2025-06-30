@@ -521,18 +521,6 @@ if __name__ == '__main__':
 
                 email_tech_summaries_text.append(generate_chatgpt_prompt(ticker, rsi_val, macd_val, macd_hist_val, signal_line_val, atr_val, adx_val))
 
-                # 캔들스틱 차트 생성 및 이미지로 저장
-                fig = go.Figure(data=[go.Candlestick(
-                    x=df.index,
-                    open=df['Open'],
-                    high=df['High'],
-                    low=df['Low'],
-                    close=df['Close']
-                )])
-                fig.update_layout(title=f'{ticker} 캔들스틱 차트', xaxis_rangeslider_visible=False)
-                chart_image_path = f"{ticker}_candlestick_chart.png"
-                fig.write_image(chart_image_path, width=800, height=400) # 이미지 해상도 설정
-
             except ValueError as ve:
                 print(f"❌ {ticker} 지표 계산 중 오류 발생: {ve}. 스킵합니다.")
             except Exception as e:
