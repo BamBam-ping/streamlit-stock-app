@@ -457,7 +457,7 @@ if __name__ == '__main__':
     send_email_mode = "--send-email" in sys.argv
     SENDER_EMAIL = os.getenv('SENDER_EMAIL', 'parkib63@gmail.com') 
     SENDER_PASSWORD = os.getenv('SENDER_PASSWORD', 'bdnj dicf dzea wdrq')
-    RECEIVER_EMAIL = os.getenv('RECEIVER_EMAIL', 'parkib63@naver.com')
+    RECEIVER_EMAIL = os.getenv('RECEIVER_EMAIL', 'inbeom.park@samsung.com')
     STREAMLIT_APP_URL = os.getenv('STREAMLIT_APP_URL', 'https://app-stock-app-bomipark.streamlit.app/')
 
     if send_email_mode:
