@@ -66,7 +66,7 @@ TICKER_DESCRIPTIONS = {
 }
 
 END_DATE = datetime.now().strftime("%Y-%m-%d")
-START_DATE = (datetime.now() - timedelta(days=1000)).strftime("%Y-%m-%d") # 약 2.5년치 데이터
+START_DATE = (datetime.now() - timedelta(days=730)).strftime("%Y-%m-%d") # 약 2년치 데이터
 MIN_DATA_REQUIRED_FOR_INDICATORS = 180 # 지표 계산에 필요한 최소 일봉 데이터 수
 
 # --- 보조 함수들 ---
