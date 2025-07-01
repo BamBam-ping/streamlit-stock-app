@@ -1,1 +1,7 @@
-
+[theme]
+base="dark"
+primaryColor="#FFC0CB" # 연한 핑크 (혹은 #F5DEB3 연한 베이지)
+backgroundColor="#282828" # 연한 블랙 (진회색)
+secondaryBackgroundColor="#383838" # 조금 더 밝은 진회색
+textColor="#e0e0e0" # 밝은 텍스트 색상
+font="sans serif"
