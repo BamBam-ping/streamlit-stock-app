@@ -453,12 +453,12 @@ def send_email(subject, body, to_email, from_email, password, attachments=None):
 
 # --- 메인 실행 로직 ---
 if __name__ == '__main__':
-    # 이메일 전송 모드인지 확인
-    send_email_mode = "--send-email" in sys.argv
+    # 이메일 전송 모드인지 확인
+    send_email_mode = "--send-email" in sys.argv
 
-    SENDER_EMAIL = os.getenv('SENDER_EMAIL', 'parkib63@gmail.com') 
-    SENDER_PASSWORD = os.getenv('SENDER_PASSWORD', 'bdnj dicf dzea wdrq') 
-    RECEIVER_EMAIL = os.getenv('RECEIVER_EMAIL','inbeom.park@samsung.com') 
+    SENDER_EMAIL = os.getenv('SENDER_EMAIL', 'parkib63@gmail.com') 
+    SENDER_PASSWORD = os.getenv('SENDER_PASSWORD', 'bdnj dicf dzea wdrq') 
+    RECEIVER_EMAIL = os.getenv('RECEIVER_EMAIL', 'inbeom.park@samsung.com') 
     STREAMLIT_APP_URL = os.getenv('STREAMLIT_APP_URL', 'https://app-stock-app-bomipark.streamlit.app/')
 
 
