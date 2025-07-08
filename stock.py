@@ -616,7 +616,7 @@ def compute_recommendation_score(last, prev_row, per, market_cap, forward_pe, de
             score += 8
         elif debt_to_equity >= 0.5 and debt_to_equity < 1.0: # Moderate debt
             score += 4
-        elif debt_to_equity >= 1.0 and debt_to_equity < 2.0: # Somewhat high debt
+        elif debt_to_equity >= 1.0 and debt_to_equity < 2.0: # Daewoo high debt
             score -= 4
         else: # Very high debt (risky)
             score -= 8
@@ -988,14 +988,6 @@ if __name__ == '__main__':
 
         # --- Stock Selection Section ---
         st.sidebar.header("종목 선택")
-        # Multiselect for individual tickers
-        individual_selected_tickers = st.sidebar.multiselect(
-            "개별 티커 선택 (다중 선택 가능):", 
-            TICKERS, 
-            default=TICKERS[0] if TICKERS else [], # Default to first ticker
-            format_func=lambda x: f"{x} - {TICKER_DESCRIPTIONS.get(x, '')}"
-        )
-
         # Multiselect for sectors
         sector_choices = list(SECTOR_MAPPING.keys())
         selected_sectors = st.sidebar.multiselect("분야 선택 (다중 선택 가능):", sector_choices, default=[])
@@ -1006,12 +998,12 @@ if __name__ == '__main__':
             for sector in selected_sectors:
                 tickers_for_detailed_analysis.extend(SECTOR_MAPPING.get(sector, []))
             tickers_for_detailed_analysis = sorted(list(set(tickers_for_detailed_analysis))) # Remove duplicates and sort
-        else:
-            tickers_for_detailed_analysis = individual_selected_tickers
+        # If no sectors are selected, tickers_for_detailed_analysis remains empty,
+        # which will correctly lead to no detailed charts being displayed.
 
 
-        if not tickers_for_detailed_analysis and not selected_sectors: # Only show message if no individual tickers selected AND no sectors selected
-            st.info("왼쪽 사이드바에서 분석할 종목 또는 분야를 하나 이상 선택해주세요.")
+        if not selected_sectors: # Only show message if no sectors selected
+            st.info("왼쪽 사이드바에서 분석할 분야를 하나 이상 선택해주세요.")
         else:
             # Store analysis results for all tickers (for summary table)
             all_ticker_analysis_results = []
@@ -1137,7 +1129,7 @@ if __name__ == '__main__':
             filtered_analysis_results = [res for res in all_ticker_analysis_results if res['ticker'] in tickers_for_detailed_analysis]
 
             if not filtered_analysis_results:
-                st.info("선택된 종목 또는 분야에 해당하는 상세 데이터를 표시할 수 없습니다.")
+                st.info("선택된 분야에 해당하는 상세 데이터를 표시할 수 없습니다.")
             else:
                 for result in filtered_analysis_results:
                     ticker = result['ticker']
