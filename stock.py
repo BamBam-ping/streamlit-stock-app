@@ -327,7 +327,7 @@ def is_volume_surge(current_row):
 def is_bullish_divergence(prev2_row, prev_row, current_row):
     """Checks for bullish divergence (price falling, RSI rising)."""
     # Ensure all rows are valid and not NaN for the relevant columns
-    if any(pd.isna(r[col]) for r in [prev2_row, prev_row, current_row] for col in ['Low', 'RSI']):
+    if any(pd.isna(r[col]) for r r in [prev2_row, prev_row, current_row] for col in ['Low', 'RSI']):
         return False
 
     price_low_decreasing = current_row['Low'] < prev_row['Low'] and prev_row['Low'] < prev2_row['Low']
@@ -992,283 +992,277 @@ if __name__ == '__main__':
         sector_choices = list(SECTOR_MAPPING.keys())
         selected_sectors = st.sidebar.multiselect("분야 선택 (다중 선택 가능):", sector_choices, default=[])
 
+        # Store analysis results for all tickers (for summary table)
+        all_ticker_analysis_results = []
+
+        for ticker in TICKERS: # Iterate through ALL TICKERS to process data for the summary table
+            try:
+                # Download stock data
+                stock_data = download_stock_data(ticker, START_DATE, END_DATE)
+                if stock_data.empty:
+                    continue
+
+                # Calculate technical indicators
+                df_with_indicators = calc_indicators(stock_data.copy())
+                if df_with_indicators.empty:
+                    continue
+
+                # Apply smart signals
+                df_with_indicators['TradeSignal'] = "관망"
+                for i in range(2, len(df_with_indicators)): # Requires at least 3 candles (current, prev, prev2)
+                    current_row = df_with_indicators.iloc[i]
+                    prev_row = df_with_indicators.iloc[i-1]
+                    prev2_row = df_with_indicators.iloc[i-2]
+                    df_with_indicators.loc[df_with_indicators.index[i], 'TradeSignal'] = smart_signal_row(current_row, prev_row, prev2_row)
+
+                last_row = df_with_indicators.iloc[-1]
+                prev_row_for_score = df_with_indicators.iloc[-2] if len(df_with_indicators) >= 2 else last_row # Fallback for prev_row
+
+                current_price = last_row['Close']
+                previous_close = df_with_indicators['Close'].iloc[-2] if len(df_with_indicators) >= 2 else np.nan
+                daily_change = current_price - previous_close if not np.isnan(previous_close) else np.nan
+                daily_change_pct = (daily_change / previous_close) * 100 if not np.isnan(previous_close) else np.nan
+
+                # Fetch additional info from Yahoo Finance (PER, Market Cap, Forward PE, Debt to Equity)
+                ticker_info = yf.Ticker(ticker).info
+                per = ticker_info.get('trailingPE', np.nan)
+                market_cap = ticker_info.get('marketCap', np.nan)
+                forward_pe = ticker_info.get('forwardPE', np.nan)
+                debt_to_equity = ticker_info.get('debtToEquity', np.nan) # Debt/Equity ratio
+
+                # Soften signal and adjust score
+                original_signal = smart_signal(df_with_indicators)
+                softened_signal = soften_signal(original_signal, market_condition)
+                
+                recommendation_score = compute_recommendation_score(last_row, prev_row_for_score, per, market_cap, forward_pe, debt_to_equity)
+                adjusted_recommendation_score = adjust_score(recommendation_score, market_condition)
+
+                action_text, percentage_value = get_action_and_percentage_by_score(softened_signal, adjusted_recommendation_score)
+                
+                # Check BB Breakout status
+                is_bb_up_breakout = last_row['BB_Squeeze_Up_Breakout']
+                is_bb_down_breakout = last_row['BB_Squeeze_Down_Breakout']
+
+                all_ticker_analysis_results.append({
+                    'ticker': ticker,
+                    'description': TICKER_DESCRIPTIONS.get(ticker, 'N/A'),
+                    'current_price': current_price,
+                    'daily_change': daily_change,
+                    'daily_change_pct': daily_change_pct,
+                    'softened_signal': softened_signal,
+                    'is_bb_up_breakout': is_bb_up_breakout, # Store BB breakout status
+                    'is_bb_down_breakout': is_bb_down_breakout, # Store BB breakout status
+                    'adjusted_recommendation_score': adjusted_recommendation_score,
+                    'action_text': action_text,
+                    'last_row': last_row,
+                    'prev_row_for_score': prev_row_for_score,
+                    'per': per,
+                    'market_cap': market_cap,
+                    'forward_pe': forward_pe,
+                    'debt_to_equity': debt_to_equity,
+                    'df_with_indicators': df_with_indicators # Store full dataframe for charts
+                })
+
+            except Exception as e:
+                # st.error(f"ERROR: Error processing {ticker}: {e}. Skipping this ticker.")
+                continue 
+
+        # --- Overall Stock Trading Signal Status Table ---
+        st.subheader("📋 전체 종목별 매매 시그널 현황")
+        if all_ticker_analysis_results:
+            summary_data = []
+            for result in all_ticker_analysis_results:
+                change_color = 'green' if result['daily_change'] >= 0 else 'red'
+                
+                # Generate BB Breakout display text
+                bb_breakout_text = ""
+                if result['is_bb_up_breakout']:
+                    bb_breakout_text = "<span style='color: green;'>상향 돌파 ▲</span>"
+                elif result['is_bb_down_breakout']:
+                    bb_breakout_text = "<span style='color: red;'>하향 돌파 ▼</span>"
+                # If neither, bb_breakout_text remains an empty string as per request
+
+                summary_data.append({
+                    "티커": result['ticker'],
+                    "종목명": result['description'],
+                    "현재가": f"{result['current_price']:.2f}",
+                    "일일변동": f"<span style='color: {change_color};'>{result['daily_change']:+.2f} ({result['daily_change_pct']:+.2f}%)</span>",
+                    "추천 시그널": f"{get_signal_symbol(result['softened_signal'])} {get_display_signal_text(result['softened_signal'])}",
+                    "추천 점수": int(result['adjusted_recommendation_score']),
+                    "권장 행동": result['action_text'],
+                    "BB 돌파": bb_breakout_text # Add BB Breakout column
+                })
+            
+            # Render table with HTML for rich text
+            html_table = "<table style='width:100%; border-collapse: collapse;'>"
+            html_table += "<thead><tr style='background-color:#f0f0f0;'>"
+            for col in summary_data[0].keys():
+                html_table += f"<th style='padding: 8px; border: 1px solid #ddd; text-align: left;'>{col}</th>"
+            html_table += "</tr></thead><tbody>"
+            for row in summary_data:
+                html_table += "<tr>"
+                for col_name, value in row.items():
+                    html_table += f"<td style='padding: 8px; border: 1px solid #ddd;'>{value}</td>"
+                html_table += "</tr>"
+            html_table += "</tbody></table>"
+            st.markdown(html_table, unsafe_allow_html=True)
+        else:
+            st.info("유효한 데이터를 가져온 종목이 없습니다.")
+
+        st.markdown("---")
+        st.subheader("📊 개별 종목 상세 분석")
+
         # Determine which tickers to display in the detailed analysis section
         tickers_for_detailed_analysis = []
         if selected_sectors:
             for sector in selected_sectors:
                 tickers_for_detailed_analysis.extend(SECTOR_MAPPING.get(sector, []))
             tickers_for_detailed_analysis = sorted(list(set(tickers_for_detailed_analysis))) # Remove duplicates and sort
-        # If no sectors are selected, tickers_for_detailed_analysis remains empty,
-        # which will correctly lead to no detailed charts being displayed.
 
+        # Filter analysis results based on selected tickers for detailed view
+        filtered_analysis_results = [res for res in all_ticker_analysis_results if res['ticker'] in tickers_for_detailed_analysis]
 
-        if not selected_sectors: # Only show message if no sectors selected
-            st.info("왼쪽 사이드바에서 분석할 분야를 하나 이상 선택해주세요.")
+        if not filtered_analysis_results:
+            st.info("선택된 분야에 해당하는 상세 데이터를 표시할 수 없습니다. 왼쪽 사이드바에서 분야를 선택해주세요.")
         else:
-            # Store analysis results for all tickers (for summary table)
-            all_ticker_analysis_results = []
+            for result in filtered_analysis_results:
+                ticker = result['ticker']
+                st.markdown(f"### {ticker} - {result['description']}")
 
-            for ticker in TICKERS: # Iterate through ALL TICKERS to process data for the summary table
-                try:
-                    # Download stock data
-                    stock_data = download_stock_data(ticker, START_DATE, END_DATE)
-                    if stock_data.empty:
-                        continue
-
-                    # Calculate technical indicators
-                    df_with_indicators = calc_indicators(stock_data.copy())
-                    if df_with_indicators.empty:
-                        continue
-
-                    # Apply smart signals
-                    df_with_indicators['TradeSignal'] = "관망"
-                    for i in range(2, len(df_with_indicators)): # Requires at least 3 candles (current, prev, prev2)
-                        current_row = df_with_indicators.iloc[i]
-                        prev_row = df_with_indicators.iloc[i-1]
-                        prev2_row = df_with_indicators.iloc[i-2]
-                        df_with_indicators.loc[df_with_indicators.index[i], 'TradeSignal'] = smart_signal_row(current_row, prev_row, prev2_row)
-
-                    last_row = df_with_indicators.iloc[-1]
-                    prev_row_for_score = df_with_indicators.iloc[-2] if len(df_with_indicators) >= 2 else last_row # Fallback for prev_row
-
-                    current_price = last_row['Close']
-                    previous_close = df_with_indicators['Close'].iloc[-2] if len(df_with_indicators) >= 2 else np.nan
-                    daily_change = current_price - previous_close if not np.isnan(previous_close) else np.nan
-                    daily_change_pct = (daily_change / previous_close) * 100 if not np.isnan(previous_close) else np.nan
-
-                    # Fetch additional info from Yahoo Finance (PER, Market Cap, Forward PE, Debt to Equity)
-                    ticker_info = yf.Ticker(ticker).info
-                    per = ticker_info.get('trailingPE', np.nan)
-                    market_cap = ticker_info.get('marketCap', np.nan)
-                    forward_pe = ticker_info.get('forwardPE', np.nan)
-                    debt_to_equity = ticker_info.get('debtToEquity', np.nan) # Debt/Equity ratio
-
-                    # Soften signal and adjust score
-                    original_signal = smart_signal(df_with_indicators)
-                    softened_signal = soften_signal(original_signal, market_condition)
-                    
-                    recommendation_score = compute_recommendation_score(last_row, prev_row_for_score, per, market_cap, forward_pe, debt_to_equity)
-                    adjusted_recommendation_score = adjust_score(recommendation_score, market_condition)
-
-                    action_text, percentage_value = get_action_and_percentage_by_score(softened_signal, adjusted_recommendation_score)
-                    
-                    # Check BB Breakout status
-                    is_bb_up_breakout = last_row['BB_Squeeze_Up_Breakout']
-                    is_bb_down_breakout = last_row['BB_Squeeze_Down_Breakout']
-
-                    all_ticker_analysis_results.append({
-                        'ticker': ticker,
-                        'description': TICKER_DESCRIPTIONS.get(ticker, 'N/A'),
-                        'current_price': current_price,
-                        'daily_change': daily_change,
-                        'daily_change_pct': daily_change_pct,
-                        'softened_signal': softened_signal,
-                        'is_bb_up_breakout': is_bb_up_breakout, # Store BB breakout status
-                        'is_bb_down_breakout': is_bb_down_breakout, # Store BB breakout status
-                        'adjusted_recommendation_score': adjusted_recommendation_score,
-                        'action_text': action_text,
-                        'last_row': last_row,
-                        'prev_row_for_score': prev_row_for_score,
-                        'per': per,
-                        'market_cap': market_cap,
-                        'forward_pe': forward_pe,
-                        'debt_to_equity': debt_to_equity,
-                        'df_with_indicators': df_with_indicators # Store full dataframe for charts
-                    })
-
-                except Exception as e:
-                    # st.error(f"ERROR: Error processing {ticker}: {e}. Skipping this ticker.")
-                    continue 
-
-            # --- Overall Stock Trading Signal Status Table ---
-            st.subheader("📋 전체 종목별 매매 시그널 현황")
-            if all_ticker_analysis_results:
-                summary_data = []
-                for result in all_ticker_analysis_results:
-                    change_color = 'green' if result['daily_change'] >= 0 else 'red'
-                    
-                    # Generate BB Breakout display text
-                    bb_breakout_text = ""
-                    if result['is_bb_up_breakout']:
-                        bb_breakout_text = "<span style='color: green;'>상향 돌파 ▲</span>"
-                    elif result['is_bb_down_breakout']:
-                        bb_breakout_text = "<span style='color: red;'>하향 돌파 ▼</span>"
-                    # If neither, bb_breakout_text remains an empty string as per request
-
-                    summary_data.append({
-                        "티커": result['ticker'],
-                        "종목명": result['description'],
-                        "현재가": f"{result['current_price']:.2f}",
-                        "일일변동": f"<span style='color: {change_color};'>{result['daily_change']:+.2f} ({result['daily_change_pct']:+.2f}%)</span>",
-                        "추천 시그널": f"{get_signal_symbol(result['softened_signal'])} {get_display_signal_text(result['softened_signal'])}",
-                        "추천 점수": int(result['adjusted_recommendation_score']),
-                        "권장 행동": result['action_text'],
-                        "BB 돌파": bb_breakout_text # Add BB Breakout column
-                    })
+                change_color = "green" if result['daily_change'] >= 0 else "red"
+                st.write(f"**현재가:** ${result['current_price']:.2f}")
+                st.markdown(f"**일일 변동:** <span style='color:{change_color}'>{result['daily_change']:+.2f} ({result['daily_change_pct']:+.2f}%)</span>", unsafe_allow_html=True)
                 
-                # Render table with HTML for rich text
-                html_table = "<table style='width:100%; border-collapse: collapse;'>"
-                html_table += "<thead><tr style='background-color:#f0f0f0;'>"
-                for col in summary_data[0].keys():
-                    html_table += f"<th style='padding: 8px; border: 1px solid #ddd; text-align: left;'>{col}</th>"
-                html_table += "</tr></thead><tbody>"
-                for row in summary_data:
-                    html_table += "<tr>"
-                    for col_name, value in row.items():
-                        html_table += f"<td style='padding: 8px; border: 1px solid #ddd;'>{value}</td>"
-                    html_table += "</tr>"
-                html_table += "</tbody></table>"
-                st.markdown(html_table, unsafe_allow_html=True)
-            else:
-                st.info("유효한 데이터를 가져온 종목이 없습니다.")
+                # BB Breakout display text for detailed analysis (separate line)
+                bb_breakout_text_detail = ""
+                if result['is_bb_up_breakout']:
+                    bb_breakout_text_detail = "<span style='color: green;'>**BB 스퀴즈 상향 돌파 발생! ▲**</span>"
+                elif result['is_bb_down_breakout']:
+                    bb_breakout_text_detail = "<span style='color: red;'>**BB 스퀴즈 하향 돌파 발생! ▼**</span>"
+                
+                st.markdown(f"**최근 추천 시그널:** {get_signal_symbol(result['softened_signal'])} {get_display_signal_text(result['softened_signal'])}", unsafe_allow_html=True)
+                if bb_breakout_text_detail:
+                    st.markdown(bb_breakout_text_detail, unsafe_allow_html=True)
 
-            st.markdown("---")
-            st.subheader("📊 개별 종목 상세 분석")
+                st.write(f"**추천 점수 (0-100):** {int(result['adjusted_recommendation_score'])}")
+                st.write(f"**권장 행동:** {result['action_text']}")
 
-            # Filter analysis results based on selected tickers for detailed view
-            filtered_analysis_results = [res for res in all_ticker_analysis_results if res['ticker'] in tickers_for_detailed_analysis]
+                st.markdown("---")
+                st.subheader(f"📈 {ticker} 캔들스틱 차트 및 기술적 지표")
 
-            if not filtered_analysis_results:
-                st.info("선택된 분야에 해당하는 상세 데이터를 표시할 수 없습니다.")
-            else:
-                for result in filtered_analysis_results:
-                    ticker = result['ticker']
-                    st.markdown(f"### {ticker} - {result['description']}")
+                df_with_indicators = result['df_with_indicators']
 
-                    change_color = "green" if result['daily_change'] >= 0 else "red"
-                    st.write(f"**현재가:** ${result['current_price']:.2f}")
-                    st.markdown(f"**일일 변동:** <span style='color:{change_color}'>{result['daily_change']:+.2f} ({result['daily_change_pct']:+.2f}%)</span>", unsafe_allow_html=True)
-                    
-                    # BB Breakout display text for detailed analysis (separate line)
-                    bb_breakout_text_detail = ""
-                    if result['is_bb_up_breakout']:
-                        bb_breakout_text_detail = "<span style='color: green;'>**BB 스퀴즈 상향 돌파 발생! ▲**</span>"
-                    elif result['is_bb_down_breakout']:
-                        bb_breakout_text_detail = "<span style='color: red;'>**BB 스퀴즈 하향 돌파 발생! ▼**</span>"
-                    
-                    st.markdown(f"**최근 추천 시그널:** {get_signal_symbol(result['softened_signal'])} {get_display_signal_text(result['softened_signal'])}", unsafe_allow_html=True)
-                    if bb_breakout_text_detail:
-                        st.markdown(bb_breakout_text_detail, unsafe_allow_html=True)
+                # Candlestick Chart
+                fig = go.Figure(data=[go.Candlestick(x=df_with_indicators.index,
+                                                    open=df_with_indicators['Open'],
+                                                    high=df_with_indicators['High'],
+                                                    low=df_with_indicators['Low'],
+                                                    close=df_with_indicators['Close'],
+                                                    name='Candlestick')])
+                # Add Moving Averages
+                fig.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['MA20'], mode='lines', name='MA20', line=dict(color='blue', width=1)))
+                fig.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['MA60'], mode='lines', name='MA60', line=dict(color='orange', width=1)))
+                fig.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['MA120'], mode='lines', name='MA120', line=dict(color='purple', width=1)))
 
-                    st.write(f"**추천 점수 (0-100):** {int(result['adjusted_recommendation_score'])}")
-                    st.write(f"**권장 행동:** {result['action_text']}")
+                # Add Bollinger Bands
+                fig.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['BB_Upper'], mode='lines', name='BB Upper', line=dict(color='gray', width=1, dash='dash')))
+                fig.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['BB_Middle'], mode='lines', name='BB Middle', line=dict(color='gray', width=1)))
+                fig.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['BB_Lower'], mode='lines', name='BB Lower', line=dict(color='gray', width=1, dash='dash')))
 
-                    st.markdown("---")
-                    st.subheader(f"📈 {ticker} 캔들스틱 차트 및 기술적 지표")
+                fig.update_layout(xaxis_rangeslider_visible=False, title=f'{ticker} 주가 차트', height=600)
+                st.plotly_chart(fig, use_container_width=True)
 
-                    df_with_indicators = result['df_with_indicators']
+                # MACD Chart
+                st.subheader(f"{ticker} MACD")
+                fig_macd = go.Figure()
+                fig_macd.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['MACD'], mode='lines', name='MACD Line', line=dict(color='blue')))
+                fig_macd.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['Signal'], mode='lines', name='Signal Line', line=dict(color='red')))
+                fig_macd.add_trace(go.Bar(x=df_with_indicators.index, y=df_with_indicators['MACD_Hist'], name='MACD Histogram', marker_color='green'))
+                fig_macd.update_layout(height=300)
+                st.plotly_chart(fig_macd, use_container_width=True)
 
-                    # Candlestick Chart
-                    fig = go.Figure(data=[go.Candlestick(x=df_with_indicators.index,
-                                                        open=df_with_indicators['Open'],
-                                                        high=df_with_indicators['High'],
-                                                        low=df_with_indicators['Low'],
-                                                        close=df_with_indicators['Close'],
-                                                        name='Candlestick')])
-                    # Add Moving Averages
-                    fig.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['MA20'], mode='lines', name='MA20', line=dict(color='blue', width=1)))
-                    fig.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['MA60'], mode='lines', name='MA60', line=dict(color='orange', width=1)))
-                    fig.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['MA120'], mode='lines', name='MA120', line=dict(color='purple', width=1)))
+                # RSI Chart
+                st.subheader(f"{ticker} RSI")
+                fig_rsi = go.Figure()
+                fig_rsi.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['RSI'], mode='lines', name='RSI', line=dict(color='purple')))
+                fig_rsi.add_hline(y=70, line_dash="dash", line_color="red", annotation_text="과매수")
+                fig_rsi.add_hline(y=30, line_dash="dash", line_color="green", annotation_text="과매도")
+                fig_rsi.update_layout(height=300)
+                st.plotly_chart(fig_rsi, use_container_width=True)
 
-                    # Add Bollinger Bands
-                    fig.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['BB_Upper'], mode='lines', name='BB Upper', line=dict(color='gray', width=1, dash='dash')))
-                    fig.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['BB_Middle'], mode='lines', name='BB Middle', line=dict(color='gray', width=1)))
-                    fig.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['BB_Lower'], mode='lines', name='BB Lower', line=dict(color='gray', width=1, dash='dash')))
+                # Stochastic Chart
+                st.subheader(f"{ticker} Stochastic Oscillator")
+                fig_stoch = go.Figure()
+                fig_stoch.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['%K'], mode='lines', name='%K', line=dict(color='blue')))
+                fig_stoch.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['%D'], mode='lines', name='%D', line=dict(color='red')))
+                fig_stoch.add_hline(y=80, line_dash="dash", line_color="red", annotation_text="과매수")
+                fig_stoch.add_hline(y=20, line_dash="dash", line_color="green", annotation_text="과매도")
+                fig_stoch.update_layout(height=300)
+                st.plotly_chart(fig_stoch, use_container_width=True)
 
-                    fig.update_layout(xaxis_rangeslider_visible=False, title=f'{ticker} 주가 차트', height=600)
-                    st.plotly_chart(fig, use_container_width=True)
+                # CCI Chart
+                st.subheader(f"{ticker} Commodity Channel Index (CCI)")
+                fig_cci = go.Figure()
+                fig_cci.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['CCI'], mode='lines', name='CCI', line=dict(color='teal')))
+                fig_cci.add_hline(y=100, line_dash="dash", line_color="red", annotation_text="과매수")
+                fig_cci.add_hline(y=-100, line_dash="dash", line_color="green", annotation_text="과매도")
+                fig_cci.update_layout(height=300)
+                st.plotly_chart(fig_cci, use_container_width=True)
 
-                    # MACD Chart
-                    st.subheader(f"{ticker} MACD")
-                    fig_macd = go.Figure()
-                    fig_macd.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['MACD'], mode='lines', name='MACD Line', line=dict(color='blue')))
-                    fig_macd.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['Signal'], mode='lines', name='Signal Line', line=dict(color='red')))
-                    fig_macd.add_trace(go.Bar(x=df_with_indicators.index, y=df_with_indicators['MACD_Hist'], name='MACD Histogram', marker_color='green'))
-                    fig_macd.update_layout(height=300)
-                    st.plotly_chart(fig_macd, use_container_width=True)
+                # ADX Chart
+                st.subheader(f"{ticker} Average Directional Index (ADX)")
+                fig_adx = go.Figure()
+                fig_adx.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['ADX'], mode='lines', name='ADX', line=dict(color='black')))
+                fig_adx.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['+DI14'], mode='lines', name='+DI14', line=dict(color='green')))
+                fig_adx.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['-DI14'], mode='lines', name='-DI14', line=dict(color='red')))
+                fig_adx.add_hline(y=25, line_dash="dash", line_color="gray", annotation_text="강한 추세")
+                fig_adx.update_layout(height=300)
+                st.plotly_chart(fig_adx, use_container_width=True)
 
-                    # RSI Chart
-                    st.subheader(f"{ticker} RSI")
-                    fig_rsi = go.Figure()
-                    fig_rsi.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['RSI'], mode='lines', name='RSI', line=dict(color='purple')))
-                    fig_rsi.add_hline(y=70, line_dash="dash", line_color="red", annotation_text="과매수")
-                    fig_rsi.add_hline(y=30, line_dash="dash", line_color="green", annotation_text="과매도")
-                    fig_rsi.update_layout(height=300)
-                    st.plotly_chart(fig_rsi, use_container_width=True)
+                st.markdown("---")
+                st.subheader(f"📋 {ticker} 주요 지표 요약 (최근 값)")
+                col_sum1, col_sum2, col_sum3 = st.columns(3)
+                with col_sum1:
+                    st.write(f"**MACD:** {result['last_row']['MACD']:.2f}")
+                    st.write(f"**MACD Signal:** {result['last_row']['Signal']:.2f}")
+                    st.write(f"**MACD Hist:** {result['last_row']['MACD_Hist']:.2f}")
+                    st.write(f"**RSI:** {result['last_row']['RSI']:.2f}")
+                    st.write(f"**Stoch %K:** {result['last_row']['%K']:.2f}")
+                with col_sum2:
+                    st.write(f"**Stoch %D:** {result['last_row']['%D']:.2f}")
+                    st.write(f"**CCI:** {result['last_row']['CCI']:.2f}")
+                    st.write(f"**ADX:** {result['last_row']['ADX']:.2f}")
+                    st.write(f"**+DI14:** {result['last_row']['+DI14']:.2f}")
+                    st.write(f"**-DI14:** {result['last_row']['-DI14']:.2f}")
+                with col_sum3:
+                    st.write(f"**MA20:** {result['last_row']['MA20']:.2f}")
+                    st.write(f"**MA60:** {result['last_row']['MA60']:.2f}")
+                    st.write(f"**MA120:** {result['last_row']['MA120']:.2f}")
+                    st.write(f"**PER:** {result['per']:.2f}" if not np.isnan(result['per']) else "**PER:** N/A")
+                    st.write(f"**시가총액:** {result['market_cap']/1_000_000_000:.2f}B" if not np.isnan(result['market_cap']) else "**시가총액:** N/A")
+                    st.write(f"**선행PER:** {result['forward_pe']:.2f}" if not np.isnan(result['forward_pe']) else "**선행PER:** N/A")
+                    st.write(f"**부채비율:** {result['debt_to_equity']:.2f}" if not np.isnan(result['debt_to_equity']) else "**부채비율:** N/A")
 
-                    # Stochastic Chart
-                    st.subheader(f"{ticker} Stochastic Oscillator")
-                    fig_stoch = go.Figure()
-                    fig_stoch.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['%K'], mode='lines', name='%K', line=dict(color='blue')))
-                    fig_stoch.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['%D'], mode='lines', name='%D', line=dict(color='red')))
-                    fig_stoch.add_hline(y=80, line_dash="dash", line_color="red", annotation_text="과매수")
-                    fig_stoch.add_hline(y=20, line_dash="dash", line_color="green", annotation_text="과매도")
-                    fig_stoch.update_layout(height=300)
-                    st.plotly_chart(fig_stoch, use_container_width=True)
-
-                    # CCI Chart
-                    st.subheader(f"{ticker} Commodity Channel Index (CCI)")
-                    fig_cci = go.Figure()
-                    fig_cci.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['CCI'], mode='lines', name='CCI', line=dict(color='teal')))
-                    fig_cci.add_hline(y=100, line_dash="dash", line_color="red", annotation_text="과매수")
-                    fig_cci.add_hline(y=-100, line_dash="dash", line_color="green", annotation_text="과매도")
-                    fig_cci.update_layout(height=300)
-                    st.plotly_chart(fig_cci, use_container_width=True)
-
-                    # ADX Chart
-                    st.subheader(f"{ticker} Average Directional Index (ADX)")
-                    fig_adx = go.Figure()
-                    fig_adx.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['ADX'], mode='lines', name='ADX', line=dict(color='black')))
-                    fig_adx.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['+DI14'], mode='lines', name='+DI14', line=dict(color='green')))
-                    fig_adx.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['-DI14'], mode='lines', name='-DI14', line=dict(color='red')))
-                    fig_adx.add_hline(y=25, line_dash="dash", line_color="gray", annotation_text="강한 추세")
-                    fig_adx.update_layout(height=300)
-                    st.plotly_chart(fig_adx, use_container_width=True)
-
-                    st.markdown("---")
-                    st.subheader(f"📋 {ticker} 주요 지표 요약 (최근 값)")
-                    col_sum1, col_sum2, col_sum3 = st.columns(3)
-                    with col_sum1:
-                        st.write(f"**MACD:** {result['last_row']['MACD']:.2f}")
-                        st.write(f"**MACD Signal:** {result['last_row']['Signal']:.2f}")
-                        st.write(f"**MACD Hist:** {result['last_row']['MACD_Hist']:.2f}")
-                        st.write(f"**RSI:** {result['last_row']['RSI']:.2f}")
-                        st.write(f"**Stoch %K:** {result['last_row']['%K']:.2f}")
-                    with col_sum2:
-                        st.write(f"**Stoch %D:** {result['last_row']['%D']:.2f}")
-                        st.write(f"**CCI:** {result['last_row']['CCI']:.2f}")
-                        st.write(f"**ADX:** {result['last_row']['ADX']:.2f}")
-                        st.write(f"**+DI14:** {result['last_row']['+DI14']:.2f}")
-                        st.write(f"**-DI14:** {result['last_row']['-DI14']:.2f}")
-                    with col_sum3:
-                        st.write(f"**MA20:** {result['last_row']['MA20']:.2f}")
-                        st.write(f"**MA60:** {result['last_row']['MA60']:.2f}")
-                        st.write(f"**MA120:** {result['last_row']['MA120']:.2f}")
-                        st.write(f"**PER:** {result['per']:.2f}" if not np.isnan(result['per']) else "**PER:** N/A")
-                        st.write(f"**시가총액:** {result['market_cap']/1_000_000_000:.2f}B" if not np.isnan(result['market_cap']) else "**시가총액:** N/A")
-                        st.write(f"**선행PER:** {result['forward_pe']:.2f}" if not np.isnan(result['forward_pe']) else "**선행PER:** N/A")
-                        st.write(f"**부채비율:** {result['debt_to_equity']:.2f}" if not np.isnan(result['debt_to_equity']) else "**부채비율:** N/A")
-
-                    # Generate and display ChatGPT prompt
-                    st.markdown("---")
-                    st.subheader(f"🤖 {ticker} ChatGPT 분석용 프롬프트")
-                    chatgpt_prompt = generate_chatgpt_prompt(
-                        ticker,
-                        result['last_row']['RSI'],
-                        result['last_row']['MACD'],
-                        result['last_row']['MACD_Hist'],
-                        result['last_row']['Signal'],
-                        result['last_row']['ATR'],
-                        result['last_row']['ADX'],
-                        result['last_row']['%K'],
-                        result['last_row']['%D'],
-                        result['last_row']['CCI'],
-                        result['per'],
-                        result['market_cap'],
-                        result['forward_pe'],
-                        result['debt_to_equity']
-                    )
-                    st.code(chatgpt_prompt, language='text')
-                    st.info("위 텍스트를 복사하여 ChatGPT에 붙여넣어 추가 분석을 요청할 수 있습니다.")
-                    st.markdown("---") # Separator for each stock analysis section
+                # Generate and display ChatGPT prompt
+                st.markdown("---")
+                st.subheader(f"🤖 {ticker} ChatGPT 분석용 프롬프트")
+                chatgpt_prompt = generate_chatgpt_prompt(
+                    ticker,
+                    result['last_row']['RSI'],
+                    result['last_row']['MACD'],
+                    result['last_row']['MACD_Hist'],
+                    result['last_row']['Signal'],
+                    result['last_row']['ATR'],
+                    result['last_row']['ADX'],
+                    result['last_row']['%K'],
+                    result['last_row']['%D'],
+                    result['last_row']['CCI'],
+                    result['per'],
+                    result['market_cap'],
+                    result['forward_pe'],
+                    result['debt_to_equity']
+                )
+                st.code(chatgpt_prompt, language='text')
+                st.info("위 텍스트를 복사하여 ChatGPT에 붙여넣어 추가 분석을 요청할 수 있습니다.")
+                st.markdown("---") # Separator for each stock analysis section
             
