@@ -327,7 +327,7 @@ def is_volume_surge(current_row):
 def is_bullish_divergence(prev2_row, prev_row, current_row):
     """Checks for bullish divergence (price falling, RSI rising)."""
     # Ensure all rows are valid and not NaN for the relevant columns
-    if any(pd.isna(r[col]) for r r in [prev2_row, prev_row, current_row] for col in ['Low', 'RSI']):
+    if any(pd.isna(r[col]) for r in [prev2_row, prev_row, current_row] for col in ['Low', 'RSI']):
         return False
 
     price_low_decreasing = current_row['Low'] < prev_row['Low'] and prev_row['Low'] < prev2_row['Low']
@@ -775,7 +775,7 @@ if __name__ == '__main__':
 
     if send_email_mode:
         print("🚀 Starting in email report sending mode...")
-        if SENDER_EMAIL == 'parkib63@naver.com' or \
+        if SENDER_EMAIL == 'parkib63@naver.naver.com' or \
            SENDER_PASSWORD == 'bdnj dicf dzea wdrq' or \
            RECEIVER_EMAIL == 'inbeom.park@samsung.com' or \
            STREAMLIT_APP_URL == 'https://app-stock-app-bomipark.streamlit.app/':
