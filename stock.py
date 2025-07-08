@@ -36,7 +36,7 @@ TICKERS = [
     "SPY": "SPDR S&P 500 ETF (미국 대형주 시장 전체)",
     "QQQ": "Invesco QQQ Trust (나스닥 100 기술/성장주 중심)",
     "SCHD": "Schwab U.S. Dividend Equity ETF (미국 고배당주)",
-}
+]
 
 END_DATE = datetime.now().strftime("%Y-%m-%d")
 START_DATE = (datetime.now() - timedelta(days=730)).strftime("%Y-%m-%d") # 약 2년치 데이터
