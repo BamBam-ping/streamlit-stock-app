@@ -13,51 +13,24 @@ import sys
 
 # --- 설정 (Configuration) ---
 TICKERS = [
-    "MSFT",     # 마이크로소프트 (기술/성장, 소프트웨어, 클라우드)
-    "AAPL",     # 애플 (기술/성장, 하드웨어, 서비스)
-    "NVDA",     # 엔비디아 (기술/초고성장, 반도체, AI)
-    "GOOGL",    # 알파벳 (기술/성장, 인터넷 서비스)
-    "AMZN",     # 아마존 (기술/성장, 이커머스, 클라우드)
-    "TSLA",     # 테슬라 (기술/성장, 전기차, AI)
-    "PLTR",     # 팔란티어 (기술/성장, AI)
-    "AMD",      # AMD (기술/성장, 반도체)
-    "TSM",      # TSMC (반도체 파운드리)
-    "ORCL",     # 오라클 (소프트웨어, 클라우드)
-    "ADBE",     # 어도비 (기술/성장, 소프트웨어)
-    "LLY",      # 일라이 릴리 (헬스케어/성장, 제약)
-    "UNH",      # 유나이티드헬스그룹 (헬스케어/성장, 관리형 건강 서비스)
-    "VRTX",     # 버텍스 파마슈티컬스 (바이오/성장, 제약)
-    "REGN",     # 리제네론 파마슈티컬스 (바이오/성장, 제약)
-    "JPM",      # JP모건 체이스 (금융/가치, 은행)
-    "V",        # 비자 (기술/성장, 결제 서비스)
-    "MS",       # 모건 스탠리 (금융)
-    "JNJ",      # 존슨앤존슨 (헬스케어/가치, 필수 소비재, 배당)
-    "HOOD",     # 로빈후드 (핀테크)
-    "SPY",      # SPDR S&P 500 ETF (미국 대형주 시장 전체)
-    "QQQ",      # Invesco QQQ Trust (나스닥 100 기술/성장주 중심)
-    "SCHD",     # Schwab U.S. Dividend Equity ETF (미국 고배당주)
-]
-
-# 티커별 설명을 저장하는 딕셔너리
-TICKER_DESCRIPTIONS = {
-    "MSFT": "마이크로소프트 (기술/성장, 소프트웨어, 클라우드)",
-    "AAPL": "애플 (기술/성장, 하드웨어, 서비스)",
-    "NVDA": "엔비디아 (기술/초고성장, 반도체, AI)",
-    "GOOGL": "알파벳 (기술/성장, 인터넷 서비스)",
-    "AMZN": "아마존 (기술/성장, 이커머스, 클라우드)",
-    "TSLA": "테슬라 (기술/성장, 전기차, AI)",
-    "PLTR": "팔란티어 (기술/성장, AI)",
-    "AMD": "AMD (기술/성장, 반도체)",
-    "TSM": "TSMC (반도체 파운드리)",
-    "ORCL": "오라클 (소프트웨어, 클라우드)",
-    "ADBE": "어도비 (기술/성장, 소프트웨어)",
-    "LLY": "일라이 릴리 (헬스케어/성장, 제약)",
-    "UNH": "유나이티드헬스그룹 (헬스케어/성장, 관리형 건강 서비스)",
-    "VRTX": "버텍스 파마슈티컬스 (바이오/성장, 제약)",
-    "REGN": "리제네론 파마슈티컬스 (바이오/성장, 제약)",
-    "JPM": "JP모건 체이스 (금융/가치, 은행)",
-    "V": "비자 (기술/성장, 결제 서비스)",
-    "MS": "모건 스탠리 (금융)",
+    "MSFT",      # 마이크로소프트 (기술/성장, 소프트웨어, 클라우드)
+    "AAPL",      # 애플 (기술/성장, 하드웨어, 서비스)
+    "NVDA",      # 엔비디아 (기술/초고성장, 반도체, AI)
+    "GOOGL",     # 알파벳 (기술/성장, 인터넷 서비스)
+    "AMZN",      # 아마존 (기술/성장, 이커머스, 클라우드)
+    "TSLA",      # 테슬라 (기술/성장, 전기차, AI)
+    "PLTR",      # 팔란티어 (기술/성장, AI)
+    "AMD",       # AMD (기술/성장, 반도체)
+    "TSM",       # TSMC (반도체 파운드리)
+    "ORCL",      # 오라클 (소프트웨어, 클라우드)
+    "ADBE",      # 어도비 (기술/성장, 소프트웨어)
+    "LLY",       # 일라이 릴리 (헬스케어/성장, 제약)
+    "UNH",       # 유나이티드헬스그룹 (헬스케어/성장, 관리형 건강 서비스)
+    "VRTX",      # 버텍스 파마슈티컬스 (바이오/성장, 제약)
+    "REGN",      # 리제네론 파마슈티컬스 (바이오/성장, 제약)
+    "JPM",       # JP모건 체이스 (금융/가치, 은행)
+    "V",         # 비자 (기술/성장, 결제 서비스)
+    "MS",        # 모건 스탠리 (금융)
     "JNJ": "존슨앤존슨 (헬스케어/가치, 필수 소비재, 배당)",
     "HOOD": "로빈후드 (핀테크)",
     "SPY": "SPDR S&P 500 ETF (미국 대형주 시장 전체)",
@@ -78,9 +51,9 @@ def download_macro_data(start, end):
         "VIX": "^VIX",
         "US10Y": "^TNX",
         "US3M": "^IRX",      # 미 3개월 국채 금리
-        "S&P500": "^GSPC",   # S&P 500 지수
-        "NASDAQ": "^IXIC",   # Nasdaq Composite 지수
-        "DXY": "DX-Y.NYB"    # 달러인덱스 (Yahoo Finance 티커)
+        "S&P500": "^GSPC",    # S&P 500 지수
+        "NASDAQ": "^IXIC",    # Nasdaq Composite 지수
+        "DXY": "DX-Y.NYB"     # 달러인덱스 (Yahoo Finance 티커)
     }
     retrieved_data = {}
     
@@ -89,7 +62,7 @@ def download_macro_data(start, end):
 
     for name, ticker_symbol in macro_tickers.items():
         try:
-            print(f"DEBUG: {name} ({ticker_symbol}) 데이터 다운로드 시도 중...")
+            # print(f"DEBUG: {name} ({ticker_symbol}) 데이터 다운로드 시도 중...")
             ticker_obj = yf.Ticker(ticker_symbol)
             data = ticker_obj.history(start=fetch_start_date, end=end) 
             
@@ -103,13 +76,13 @@ def download_macro_data(start, end):
                     "value": current_value,
                     "change": change
                 }
-                print(f"DEBUG: {name} 데이터 성공적으로 가져옴: {current_value}, 변화: {change:.2f}")
+                # print(f"DEBUG: {name} 데이터 성공적으로 가져옴: {current_value}, 변화: {change:.2f}")
             else:
                 retrieved_data[name] = {"value": np.nan, "change": np.nan}
-                print(f"DEBUG: {name} 데이터가 비어있거나 'Close' 컬럼이 NaN입니다. NaN으로 설정합니다.")
+                # print(f"DEBUG: {name} 데이터가 비어있거나 'Close' 컬럼이 NaN입니다. NaN으로 설정합니다.")
         except Exception as e:
             retrieved_data[name] = {"value": np.nan, "change": np.nan}
-            print(f"ERROR: {name} ({ticker_symbol}) 다운로드 실패. 이유: {e}. 건너뜁니다.")
+            # print(f"ERROR: {name} ({ticker_symbol}) 다운로드 실패. 이유: {e}. 건너뜁니다.")
     
     # 장단기 금리차 계산 (10년물 - 3개월물)
     us10y_val = retrieved_data.get("US10Y", {}).get("value", np.nan)
@@ -308,15 +281,23 @@ def is_volume_surge(current_row):
     """거래량이 급증했는지 확인합니다."""
     return current_row['Volume'] > (current_row['Volume_MA20'] * 1.5)
 
-def is_bullish_divergence(prev_row, current_row, prev2_row):
+def is_bullish_divergence(prev2_row, prev_row, current_row):
     """강세 다이버전스 발생 여부를 확인합니다. (가격은 하락, RSI는 상승)"""
+    # Ensure all rows are valid and not NaN for the relevant columns
+    if any(pd.isna(r[col]) for r in [prev2_row, prev_row, current_row] for col in ['Low', 'RSI']):
+        return False
+
     price_low_decreasing = current_row['Low'] < prev_row['Low'] and prev_row['Low'] < prev2_row['Low']
     rsi_low_increasing = current_row['RSI'] > prev_row['RSI'] and prev_row['RSI'] > prev2_row['RSI']
     # RSI가 과매도권 근처에서 발생 시 신뢰도 증가
     return price_low_decreasing and rsi_low_increasing and current_row['RSI'] < 50
 
-def is_bearish_divergence(prev_row, current_row, prev2_row):
+def is_bearish_divergence(prev2_row, prev_row, current_row):
     """약세 다이버전스 발생 여부를 확인합니다. (가격은 상승, RSI는 하락)"""
+    # Ensure all rows are valid and not NaN for the relevant columns
+    if any(pd.isna(r[col]) for r in [prev2_row, prev_row, current_row] for col in ['High', 'RSI']):
+        return False
+
     price_high_increasing = current_row['High'] > prev_row['High'] and prev_row['High'] > prev2_row['High']
     rsi_high_decreasing = current_row['RSI'] < prev_row['RSI'] and prev_row['RSI'] < prev2_row['RSI']
     # RSI가 과매수권 근처에서 발생 시 신뢰도 증가
@@ -324,6 +305,9 @@ def is_bearish_divergence(prev_row, current_row, prev2_row):
 
 def is_hammer_candlestick(current_row, prev_row):
     """망치형 캔들스틱 발생 여부를 확인합니다. (하락 추세에서 반전 신호)"""
+    if any(pd.isna(current_row[col]) for col in ['Open', 'Close', 'High', 'Low']):
+        return False
+
     open_price = current_row['Open']
     close_price = current_row['Close']
     high_price = current_row['High']
@@ -440,10 +424,13 @@ def smart_signal_row(row, prev_row, prev2_row):
         return "매도"
 
     # 8. 보조 시그널
-    if is_bullish_divergence(prev2_row, prev_row, row): # 다이버전스 감지는 3개 봉 필요
-        return "반등 가능성"
-    if is_bearish_divergence(prev2_row, prev_row, row):
-        return "하락 가능성"
+    # 다이버전스 감지는 3개 봉 필요, prev2_row가 유효한지 확인
+    if prev2_row is not None:
+        if is_bullish_divergence(prev2_row, prev_row, row):
+            return "반등 가능성"
+        if is_bearish_divergence(prev2_row, prev_row, row):
+            return "하락 가능성"
+    
     if is_hammer_candlestick(row, prev_row): # 해머 캔들스틱 (반전)
         return "반전 신호"
     
@@ -672,13 +659,21 @@ def get_signal_symbol(signal_text):
         return "<span style='color: orange;'>●</span>"  # 주황색 원형 (중립/관망)
 
 # --- 시그널 텍스트를 UI 표시용으로 변환 ---
-def get_display_signal_text(signal_original):
-    """원래 시그널 텍스트를 UI 표시를 위한 형태로 변환합니다."""
+def get_display_signal_text(signal_original, is_bb_squeeze_up=False, is_bb_squeeze_down=False):
+    """원래 시그널 텍스트를 UI 표시를 위한 형태로 변환하고, BB 돌파 여부를 별도로 반환합니다."""
+    display_text = signal_original
     if signal_original == "강력 매수":
-        return "강력 상승추세 가능성"
+        display_text = "강력 상승추세 가능성"
     elif signal_original == "강력 매도":
-        return "강력 하락추세 가능성"
-    return signal_original
+        display_text = "강력 하락추세 가능성"
+    
+    bb_indicator = ""
+    if is_bb_squeeze_up:
+        bb_indicator = " ↑(BB)" # Concise indicator
+    elif is_bb_squeeze_down:
+        bb_indicator = " ↓(BB)" # Concise indicator
+        
+    return display_text, bb_indicator
 
 # --- ChatGPT 프롬프트 생성 ---
 def generate_chatgpt_prompt(ticker, rsi, macd, macd_hist, signal_line, atr, adx, k_stoch, d_stoch, cci, per, market_cap, forward_pe, debt_to_equity):
@@ -695,7 +690,6 @@ def generate_chatgpt_prompt(ticker, rsi, macd, macd_hist, signal_line, atr, adx,
     forward_pe_str = f"선행PER: {forward_pe:.2f}" if not np.isnan(forward_pe) else "선행PER: N/A"
     debt_to_equity_str = f"부채비율: {debt_to_equity:.2f}" if not np.isnan(debt_to_equity) else "부채비율: N/A"
 
-
     return f"{ticker}: {rsi_str}, {macd_str}, {atr_str}, {adx_str}, {stoch_str}, {cci_str}, {per_str}, {market_cap_str}, {forward_pe_str}, {debt_to_equity_str}"
 
 # --- 이메일 전송 함수 ---
@@ -703,7 +697,7 @@ def send_email(subject, body, to_email, from_email, password, attachments=None):
     """이메일을 전송하는 함수입니다."""
     msg = MIMEMultipart()
     msg['From'] = from_email
-    msg['To'] = to_email 
+    msg['To'] = to_email  
     msg['Subject'] = subject
 
     msg.attach(MIMEText(body, 'html'))
@@ -716,14 +710,14 @@ def send_email(subject, body, to_email, from_email, password, attachments=None):
                 part['Content-Disposition'] = f'attachment; filename="{file_name}"'
                 msg.attach(part)
             except FileNotFoundError:
-                print(f"경고: 첨부 파일 {file_path}를 찾을 수 없습니다. 건너뜁니다.")
+                print(f"경고: 첨부 파일 {file_path}를 찾을 수 없습니다. 건너킵니다.")
             except Exception as e:
-                print(f"경고: 첨부 파일 {file_path} 처리 중 오류 발생: {e}. 건너뜁니다.")
+                print(f"경고: 첨부 파일 {file_path} 처리 중 오류 발생: {e}. 건너킵니다.")
 
     try:
         server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
         server.login(from_email, password)
-        server.send_message(msg) 
+        server.send_message(msg)  
         server.quit()
         print("✅ 이메일 전송 성공!")
     except smtplib.SMTPAuthenticationError:
@@ -736,25 +730,23 @@ if __name__ == '__main__':
     # 이메일 전송 모드인지 확인
     send_email_mode = "--send-email" in sys.argv
 
+    # 환경 변수 또는 기본값 설정
     SENDER_EMAIL = os.getenv('SENDER_EMAIL', 'parkib63@naver.com')
-    SENDER_PASSWORD = os.getenv('SENDER_PASSWORD', 'bdnj dicf dzea wdrq')
+    SENDER_PASSWORD = os.getenv('SENDER_PASSWORD', 'bdnj dicf dzea wdrq') # Google 앱 비밀번호 사용 권장
     RECEIVER_EMAIL = os.getenv('RECEIVER_EMAIL', 'inbeom.park@samsung.com')
     STREAMLIT_APP_URL = os.getenv('STREAMLIT_APP_URL', 'https://app-stock-app-bomipark.streamlit.app/')
 
-
     if send_email_mode:
         print("🚀 이메일 보고서 전송 모드로 시작합니다...")
-        if SENDER_EMAIL == 'censored' or \
-           SENDER_PASSWORD == 'censored' or \
-           RECEIVER_EMAIL == 'censored' or \
+        if SENDER_EMAIL == 'parkib63@naver.com' or \
+           SENDER_PASSWORD == 'bdnj dicf dzea wdrq' or \
+           RECEIVER_EMAIL == 'inbeom.park@samsung.com' or \
            STREAMLIT_APP_URL == 'https://app-stock-app-bomipark.streamlit.app/':
             print("🚨 경고: 이메일 발신자 정보(SENDER_EMAIL, SENDER_PASSWORD) 또는 수신자 이메일(RECEIVER_EMAIL) 혹은 Streamlit 앱 URL(STREAMLIT_APP_URL)이 설정되지 않았습니다. 환경 변수를 확인하거나 코드 내 값을 변경하세요.")
-            sys.exit(1)
-
+            # sys.exit(1) # Streamlit 앱에서 실행될 경우 앱이 종료될 수 있으므로 주석 처리
 
         email_summary_rows = []
         email_tech_summaries_text = []
-
 
         macro_start_date = (datetime.now() - timedelta(days=60)).strftime("%Y-%m-%d")
         macro_data = download_macro_data(macro_start_date, END_DATE)
@@ -790,381 +782,347 @@ if __name__ == '__main__':
                                 f"<span style='font-size: 0.8em; color: {'green' if macro_data.get('DXY', {}).get('change', 0) >= 0 else 'red'};'>"
                                 f"({macro_data.get('DXY', {}).get('change', np.nan):+.2f})"
                                 f"</span></p>")
-        email_body_parts.append(f"<p><b>자세한 분석 및 실시간 캔들스틱 차트를 보려면 아래 링크를 클릭하세요:</b></p>")
-        email_body_parts.append(f"<p><a href='{STREAMLIT_APP_URL}'>👉 Streamlit 주식 시그널 대시보드 바로가기</a></p>")
-
-
-        print(f"시장 상태: {market_condition}")
+        email_body_parts.append(f"<p><b>자세한 분석 및 실시간 캔들스틱 차트를 보려면 아래 링크를 클릭하세요:</b> <a href='{STREAMLIT_APP_URL}'>{STREAMLIT_APP_URL}</a></p>")
+        
+        email_body_parts.append(f"<h2>개별 종목 분석 요약</h2>")
+        email_body_parts.append("<table border='1' style='width:100%; border-collapse: collapse;'>")
+        email_body_parts.append("<thead><tr>"
+                                "<th>티커</th>"
+                                "<th>종목명</th>"
+                                "<th>현재가</th>"
+                                "<th>일일변동</th>"
+                                "<th>추천 시그널</th>"
+                                "<th>추천 점수</th>"
+                                "<th>권장 행동</th>"
+                                "</tr></thead><tbody>")
 
         for ticker in TICKERS:
-            print(f"처리 중: {ticker}...")
             try:
-                ticker_obj = yf.Ticker(ticker)
-                data = ticker_obj.history(start=START_DATE, end=END_DATE, interval="1d")
-
-                if data.empty or not all(col in data.columns for col in ['Open', 'High', 'Low', 'Close', 'Volume']):
-                    print(f"❌ {ticker} 데이터 누락 또는 형식 오류. 건너뜁니다.")
+                # 주식 데이터 다운로드
+                stock_data = yf.download(ticker, start=START_DATE, end=END_DATE)
+                if stock_data.empty:
+                    print(f"경고: {ticker} 주식 데이터를 찾을 수 없습니다. 건너킵니다.")
                     continue
 
-                if 'Adj Close' in data.columns:
-                    data = data.drop(columns=['Adj Close'])
-
-                df = calc_indicators(data[['Open', 'High', 'Low', 'Close', 'Volume']].copy())
-
-                if df.empty or len(df) < MIN_DATA_REQUIRED_FOR_INDICATORS:
-                    print(f"❌ {ticker} 지표 계산 후 데이터 부족 ({len(df)}개). 시그널 생성을 건너뜁니다.")
+                # 기술적 지표 계산
+                df_with_indicators = calc_indicators(stock_data.copy())
+                if df_with_indicators.empty:
+                    print(f"경고: {ticker} 지표 계산에 필요한 데이터가 부족합니다. 건너킵니다.")
                     continue
 
-                df['TradeSignal'] = ["관망"] * len(df)
-                for i in range(2, len(df)):
-                    df.loc[df.index[i], 'TradeSignal'] = smart_signal_row(df.iloc[i], df.iloc[i-1], df.iloc[i-2])
+                # 스마트 시그널 적용
+                df_with_indicators['TradeSignal'] = "관망"
+                for i in range(2, len(df_with_indicators)): # 최소 3개 봉 필요 (현재, 이전, 이전2)
+                    current_row = df_with_indicators.iloc[i]
+                    prev_row = df_with_indicators.iloc[i-1]
+                    prev2_row = df_with_indicators.iloc[i-2]
+                    df_with_indicators.loc[df_with_indicators.index[i], 'TradeSignal'] = smart_signal_row(current_row, prev_row, prev2_row)
 
-                last = df.iloc[-1]
-                prev_row = df.iloc[-2]
+                last_row = df_with_indicators.iloc[-1]
+                prev_row_for_score = df_with_indicators.iloc[-2] if len(df_with_indicators) >= 2 else last_row # Fallback for prev_row
 
-                # 기본 정보 가져오기
-                info = ticker_obj.info
-                per = info.get('trailingPE', np.nan)
-                market_cap = info.get('marketCap', np.nan)
-                forward_pe = info.get('forwardPE', np.nan)
-                debt_to_equity = info.get('debtToEquity', np.nan)
+                current_price = last_row['Close']
+                previous_close = df_with_indicators['Close'].iloc[-2] if len(df_with_indicators) >= 2 else np.nan
+                daily_change = current_price - previous_close if not np.isnan(previous_close) else np.nan
+                daily_change_pct = (daily_change / previous_close) * 100 if not np.isnan(previous_close) else np.nan
 
-                signal = last['TradeSignal']
-                signal = soften_signal(signal, market_condition)
-                df.loc[df.index[-1], 'TradeSignal'] = signal # 최종 시그널 업데이트
+                # Yahoo Finance에서 추가 정보 가져오기 (PER, 시가총액, 선행PER, 부채비율)
+                ticker_info = yf.Ticker(ticker).info
+                per = ticker_info.get('trailingPE', np.nan)
+                market_cap = ticker_info.get('marketCap', np.nan)
+                forward_pe = ticker_info.get('forwardPE', np.nan)
+                debt_to_equity = ticker_info.get('debtToEquity', np.nan) # 부채비율 (Debt/Equity)
 
-                score = compute_recommendation_score(last, prev_row, per, market_cap, forward_pe, debt_to_equity)
-                score = adjust_score(score, market_condition) # 거시경제에 따른 점수 조정
-                action, pct = get_action_and_percentage_by_score(signal, score)
+                # 시그널 완화 및 점수 조정
+                original_signal = smart_signal(df_with_indicators)
+                softened_signal = soften_signal(original_signal, market_condition)
+                
+                recommendation_score = compute_recommendation_score(last_row, prev_row_for_score, per, market_cap, forward_pe, debt_to_equity)
+                adjusted_recommendation_score = adjust_score(recommendation_score, market_condition)
 
-                email_summary_rows.append({
-                    "Ticker": ticker,
-                    "Signal": signal,
-                    "추천정도": f"{score:.1f}",
-                    "추천 행동": action,
-                })
+                action_text, percentage_value = get_action_and_percentage_by_score(softened_signal, adjusted_recommendation_score)
+                
+                # BB 돌파 여부 확인 및 시그널 텍스트에 추가
+                is_bb_up_breakout = last_row['BB_Squeeze_Up_Breakout']
+                is_bb_down_breakout = last_row['BB_Squeeze_Down_Breakout']
+                display_signal_text_base, bb_indicator_text = get_display_signal_text(softened_signal, is_bb_up_breakout, is_bb_down_breakout)
 
-                rsi_val = float(last.get('RSI', np.nan))
-                macd_val = float(last.get('MACD', np.nan))
-                macd_hist_val = float(last.get('MACD_Hist', np.nan))
-                signal_line_val = float(last.get('Signal', np.nan))
-                atr_val = float(last.get('ATR', np.nan))
-                adx_val = float(last.get('ADX', np.nan))
-                k_stoch_val = float(last.get('%K', np.nan))
-                d_stoch_val = float(last.get('%D', np.nan))
-                cci_val = float(last.get('CCI', np.nan))
+                # 이메일 요약 테이블 행 추가
+                change_color = 'green' if daily_change >= 0 else 'red'
+                email_summary_rows.append(f"<tr>"
+                                          f"<td>{ticker}</td>"
+                                          f"<td>{TICKER_DESCRIPTIONS.get(ticker, 'N/A')}</td>"
+                                          f"<td>{current_price:.2f}</td>"
+                                          f"<td style='color: {change_color};'>{daily_change:+.2f} ({daily_change_pct:+.2f}%)</td>"
+                                          f"<td>{get_signal_symbol(softened_signal)} {display_signal_text_base}{bb_indicator_text}</td>"
+                                          f"<td>{int(adjusted_recommendation_score)}</td>"
+                                          f"<td>{action_text}</td>"
+                                          f"</tr>")
+                
+                # ChatGPT 프롬프트용 기술적 지표 요약
+                email_tech_summaries_text.append(
+                    generate_chatgpt_prompt(
+                        ticker,
+                        last_row['RSI'],
+                        last_row['MACD'],
+                        last_row['MACD_Hist'],
+                        last_row['Signal'],
+                        last_row['ATR'],
+                        last_row['ADX'],
+                        last_row['%K'],
+                        last_row['%D'],
+                        last_row['CCI'],
+                        per,
+                        market_cap,
+                        forward_pe,
+                        debt_to_equity
+                    )
+                )
 
-
-                email_tech_summaries_text.append(generate_chatgpt_prompt(ticker, rsi_val, macd_val, macd_hist_val, signal_line_val, atr_val, adx_val, k_stoch_val, d_stoch_val, cci_val, per, market_cap, forward_pe, debt_to_equity))
-
-            except ValueError as ve:
-                print(f"❌ {ticker} 지표 계산 중 오류 발생: {ve}. 건너뜁니다.")
             except Exception as e:
-                print(f"❌ {ticker} 데이터 처리 중 알 수 없는 오류 발생: {e}. 건너뜁니다.")
+                print(f"ERROR: {ticker} 처리 중 오류 발생: {e}. 건너킵니다.")
+                email_summary_rows.append(f"<tr><td>{ticker}</td><td colspan='6'>데이터 처리 오류: {e}</td></tr>")
                 continue
+        
+        email_body_parts.append("".join(email_summary_rows))
+        email_body_parts.append("</tbody></table>")
 
-        if email_summary_rows:
-            email_body_parts.append("<h2>📋 오늘의 종목별 매매 전략 요약</h2>")
-            email_body_parts.append(pd.DataFrame(email_summary_rows).to_html(index=False))
+        email_body_parts.append(f"<h2>ChatGPT 분석용 기술적 지표 요약 (복사하여 사용)</h2>")
+        email_body_parts.append("<pre style='background-color: #f0f0f0; padding: 10px; border-radius: 5px;'>")
+        email_body_parts.append("\n".join(email_tech_summaries_text))
+        email_body_parts.append("</pre>")
 
-        if email_tech_summaries_text:
-            ai_prompt_template = """
-<br>
-<h3>🧠 AI에게 물어보는 기술적 분석 프롬프트</h3>
-<p>아래 각 종목의 기술적 지표만 보고, 
-미국 주식 전문 트레이더처럼 매수/매도/익절/보유/관망 시그널과 
-매수/매도/익절이 필요한 경우 “몇 % 정도” 하면 좋을지도 같이 구체적으로 알려줘.</p>
-<p>- 한 종목당 한 줄씩,<br>- 신호와 추천 비율(%)만 간단명료하게<br>- 사유도 한 줄로 덧붙여줘.</p>
-<p>아래 표로 정리해서 답변해줘.</p>
-<pre><code>| 종목 | 추천액션 | 비율(%) | 근거 요약 |
-|------|----------------|---------|-----------------------------|
-"""
-            full_ai_prompt_content = ai_prompt_template + "\n".join(email_tech_summaries_text) + "\n</code></pre>"
-            email_body_parts.append(full_ai_prompt_content)
+        email_subject = f"📈 US 주식 시그널 보고서 - {datetime.now().strftime('%Y-%m-%d')}"
+        full_email_body = "".join(email_body_parts)
 
-        final_email_body = "".join(email_body_parts)
+        send_email(email_subject, full_email_body, RECEIVER_EMAIL, SENDER_EMAIL, SENDER_PASSWORD)
 
-        EMAIL_SUBJECT = f"US Stock Signal Dashboard - {datetime.now().strftime('%Y-%m-%d')}"
-        email_attachments = []
-        send_email(EMAIL_SUBJECT, final_email_body, RECEIVER_EMAIL, SENDER_EMAIL, SENDER_PASSWORD, attachments=email_attachments)
+    else: # Streamlit 앱 실행 모드
+        st.set_page_config(layout="wide", page_title="US 주식 시그널 대시보드")
 
+        st.title("📈 US 주식 시그널 대시보드")
+        st.markdown("미국 주식 시장의 주요 기술적 지표와 거시경제 데이터를 기반으로 매매 시그널 및 추천 점수를 제공합니다.")
 
-    else:
-        # --- Streamlit 대시보드 UI ---
-        st.set_page_config(layout="wide", page_title="US Stock Signal Dashboard")
-        st.title("📈 US Stock Signal Dashboard")
-        st.subheader(f"데이터 기준일: {END_DATE}")
-
-        # 마켓 센티멘트
-        st.markdown("---")
-        st.subheader("마켓 센티멘트 현황")
-        macro_start_date = (datetime.now() - timedelta(days=60)).strftime("%Y-%m-%d")
+        # --- 거시경제 지표 섹션 ---
+        st.subheader("📊 마켓 센티멘트 현황")
+        
+        # 캐시된 거시경제 데이터 로드
+        macro_start_date = (datetime.now() - timedelta(days=60)).strftime("%Y-%m-%d") # 거시경제 데이터는 2개월치만
         macro_data = download_macro_data(macro_start_date, END_DATE)
         market_condition = macro_filter(macro_data)
 
-        # 컬럼 수 조정 및 순서 변경: VIX, 시장 상태, 미 10년 금리, 미 3개월 금리, S&P500, NASDAQ, 달러인덱스
-        col_vix, col_market, col_us10y, col_us3m, col_sp500, col_nasdaq, col_dxy = st.columns(7) 
-        
-        def format_macro_metric(value_dict, unit=""):
-            value = value_dict.get('value', np.nan)
-            change = value_dict.get('change', np.nan)
-            
-            display_value = f"{value:.2f}{unit}" if not np.isnan(value) else "N/A"
-            
-            if not np.isnan(change):
-                color = "green" if change >= 0 else "red"
-                change_str = f"({change:+.2f}{unit})"
-                return f"{display_value} <span style='font-size: 0.8em; color: {color};'>{change_str}</span>"
-            return display_value
-
-        with col_vix:
-            st.markdown(f"**VIX**<br>{format_macro_metric(macro_data.get('VIX', {}))}", unsafe_allow_html=True)
-        with col_market:
-            st.markdown(f"**시장 상태**<br>{market_condition}", unsafe_allow_html=True)
-        with col_us10y:
-            st.markdown(f"**미 10년 금리**<br>{format_macro_metric(macro_data.get('US10Y', {}), '%')}", unsafe_allow_html=True)
-        with col_us3m:
-            st.markdown(f"**미 3개월 금리**<br>{format_macro_metric(macro_data.get('US3M', {}), '%')}", unsafe_allow_html=True)
-        with col_sp500:
-            st.markdown(f"**S&P 500**<br>{format_macro_metric(macro_data.get('S&P500', {}))}", unsafe_allow_html=True)
-        with col_nasdaq:
-            st.markdown(f"**NASDAQ**<br>{format_macro_metric(macro_data.get('NASDAQ', {}))}", unsafe_allow_html=True)
-        with col_dxy:
-            st.markdown(f"**달러인덱스 (DXY)**<br>{format_macro_metric(macro_data.get('DXY', {}))}", unsafe_allow_html=True)
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric(label="VIX (변동성 지수)", 
+                      value=f"{macro_data.get('VIX', {}).get('value', np.nan):.2f}" if not np.isnan(macro_data.get('VIX', {}).get('value', np.nan)) else "N/A",
+                      delta=f"{macro_data.get('VIX', {}).get('change', np.nan):.2f}" if not np.isnan(macro_data.get('VIX', {}).get('change', np.nan)) else None,
+                      delta_color="inverse")
+            st.metric(label="미 10년 금리", 
+                      value=f"{macro_data.get('US10Y', {}).get('value', np.nan):.2f}%" if not np.isnan(macro_data.get('US10Y', {}).get('value', np.nan)) else "N/A",
+                      delta=f"{macro_data.get('US10Y', {}).get('change', np.nan):.2f}%" if not np.isnan(macro_data.get('US10Y', {}).get('change', np.nan)) else None)
+        with col2:
+            st.metric(label="시장 상태", value=market_condition)
+            st.metric(label="미 3개월 금리", 
+                      value=f"{macro_data.get('US3M', {}).get('value', np.nan):.2f}%" if not np.isnan(macro_data.get('US3M', {}).get('value', np.nan)) else "N/A",
+                      delta=f"{macro_data.get('US3M', {}).get('change', np.nan):.2f}%" if not np.isnan(macro_data.get('US3M', {}).get('change', np.nan)) else None)
+        with col3:
+            st.metric(label="S&P 500", 
+                      value=f"{macro_data.get('S&P500', {}).get('value', np.nan):.2f}" if not np.isnan(macro_data.get('S&P500', {}).get('value', np.nan)) else "N/A",
+                      delta=f"{macro_data.get('S&P500', {}).get('change', np.nan):.2f}" if not np.isnan(macro_data.get('S&P500', {}).get('change', np.nan)) else None)
+            st.metric(label="NASDAQ", 
+                      value=f"{macro_data.get('NASDAQ', {}).get('value', np.nan):.2f}" if not np.isnan(macro_data.get('NASDAQ', {}).get('value', np.nan)) else "N/A",
+                      delta=f"{macro_data.get('NASDAQ', {}).get('change', np.nan):.2f}" if not np.isnan(macro_data.get('NASDAQ', {}).get('change', np.nan)) else None)
+            st.metric(label="달러인덱스 (DXY)", 
+                      value=f"{macro_data.get('DXY', {}).get('value', np.nan):.2f}" if not np.isnan(macro_data.get('DXY', {}).get('value', np.nan)) else "N/A",
+                      delta=f"{macro_data.get('DXY', {}).get('change', np.nan):.2f}" if not np.isnan(macro_data.get('DXY', {}).get('change', np.nan)) else None)
 
         st.markdown("---")
 
-        summary_rows = []
-        all_tech_summaries_text = []
-        
-        all_ticker_data = {}
-        # 모든 티커 데이터를 먼저 처리하여 all_ticker_data에 저장
-        for ticker in TICKERS:
+        # --- 종목 선택 섹션 ---
+        st.sidebar.header("종목 선택")
+        selected_ticker = st.sidebar.selectbox("티커를 선택하세요:", TICKERS, format_func=lambda x: f"{x} - {TICKER_DESCRIPTIONS.get(x, '')}")
+
+        st.subheader(f"📈 {selected_ticker} - {TICKER_DESCRIPTIONS.get(selected_ticker, '')} 분석")
+
+        # 주식 데이터 다운로드
+        @st.cache_data
+        def download_stock_data(ticker, start, end):
             try:
-                ticker_obj = yf.Ticker(ticker)
-                data = ticker_obj.history(start=START_DATE, end=END_DATE, interval="1d")
-
-                if data.empty or not all(col in data.columns for col in ['Open', 'High', 'Low', 'Close', 'Volume']):
-                    st.warning(f"❌ **{ticker}** 데이터 누락 또는 형식 오류. 건너뜁니다.")
-                    continue
-
-                if 'Adj Close' in data.columns:
-                    data = data.drop(columns=['Adj Close'])
-
-                df = calc_indicators(data[['Open', 'High', 'Low', 'Close', 'Volume']].copy())
-
-                if df.empty or len(df) < MIN_DATA_REQUIRED_FOR_INDICATORS:
-                    st.warning(f"❌ **{ticker}** 지표 계산 후 데이터 부족 ({len(df)}개). 시그널 생성을 건너뛰었습니다.")
-                    continue
-
-                df['TradeSignal'] = ["관망"] * len(df)
-                for i in range(2, len(df)):
-                    df.loc[df.index[i], 'TradeSignal'] = smart_signal_row(df.iloc[i], df.iloc[i-1], df.iloc[i-2])
-
-                last = df.iloc[-1]
-                prev_row = df.iloc[-2]
-
-                # 기본 정보 가져오기
-                info = ticker_obj.info
-                per = info.get('trailingPE', np.nan)
-                market_cap = info.get('marketCap', np.nan)
-                forward_pe = info.get('forwardPE', np.nan)
-                debt_to_equity = info.get('debtToEquity', np.nan)
-
-                signal = last['TradeSignal']
-                signal = soften_signal(signal, market_condition) # 거시경제 필터링 적용
-                df.loc[df.index[-1], 'TradeSignal'] = signal # 최종 시그널 업데이트
-
-                score = compute_recommendation_score(last, prev_row, per, market_cap, forward_pe, debt_to_equity)
-                score = adjust_score(score, market_condition) # 거시경제에 따른 점수 조정
-                action, pct = get_action_and_percentage_by_score(signal, score)
-
-                summary_rows.append({
-                    "Ticker": ticker,
-                    "Signal": signal,
-                    "추천정도": f"{score:.1f}",
-                    "추천 행동": action,
-                })
-                all_ticker_data[ticker] = {
-                    'df': df,
-                    'last': last,
-                    'prev_row': prev_row,
-                    'signal': signal,
-                    'score': score,
-                    'action': action,
-                    'pct': pct,
-                    'per': per, # PER 저장
-                    'market_cap': market_cap, # 시가총액 저장
-                    'forward_pe': forward_pe, # 선행 PER 저장
-                    'debt_to_equity': debt_to_equity # 부채비율 저장
-                }
-
-            except ValueError as ve:
-                st.error(f"❌ **{ticker}** 지표 계산 중 오류 발생: **{ve}**")
-                st.warning(f"**{ticker}** 시그널 생성을 건너뛰었습니다.")
+                data = yf.download(ticker, start=start, end=end)
+                return data
             except Exception as e:
-                st.error(f"❌ **{ticker}** 데이터 처리 중 알 수 없는 오류 발생: **{e}**")
-                st.warning(f"**{ticker}** 시그널 생성을 건너뛰었습니다.")
+                st.error(f"'{ticker}' 주식 데이터를 다운로드하는 데 실패했습니다: {e}")
+                return pd.DataFrame()
 
-        # --- 매수/매도/관망 종목 목록 표시 ---
-        st.subheader("📊 전체 종목별 매매 시그널 현황")
-        
-        buy_tickers = []
-        sell_tickers = []
-        hold_tickers = []
+        stock_data = download_stock_data(selected_ticker, START_DATE, END_DATE)
 
-        for ticker, data_for_ticker in all_ticker_data.items():
-            signal = data_for_ticker['signal']
-            # 매수 또는 반등 가능성 시그널
-            if "매수" in signal or "반등 가능성" in signal:
-                buy_tickers.append(ticker)
-            # 매도 또는 하락 가능성 또는 익절 매도 시그널
-            elif "매도" in signal or "하락 가능성" in signal or "익절 매도" in signal:
-                sell_tickers.append(ticker)
-            # 그 외 시그널 (관망, 보유, 반전)
-            else: 
-                hold_tickers.append(ticker)
+        if not stock_data.empty:
+            # 기술적 지표 계산
+            df_with_indicators = calc_indicators(stock_data.copy())
 
-        total_stocks_processed = len(all_ticker_data)
-        
-        if total_stocks_processed > 0:
-            col_buy, col_sell, col_hold = st.columns(3)
-            with col_buy:
-                st.markdown("#### ✅ 매수 시그널 종목")
-                if buy_tickers:
-                    for t in buy_tickers:
-                        # get_signal_symbol 함수가 HTML을 반환하므로 unsafe_allow_html=True 설정
-                        st.markdown(f"- {t} {get_signal_symbol('매수')} - {TICKER_DESCRIPTIONS.get(t, '설명 없음')}", unsafe_allow_html=True)
-                else:
-                    st.write("없음")
-            with col_sell:
-                st.markdown("#### 🔻 매도 시그널 종목")
-                if sell_tickers:
-                    for t in sell_tickers:
-                        # get_signal_symbol 함수가 HTML을 반환하므로 unsafe_allow_html=True 설정
-                        st.markdown(f"- {t} {get_signal_symbol('매도')} - {TICKER_DESCRIPTIONS.get(t, '설명 없음')}", unsafe_allow_html=True)
-                else:
-                    st.write("없음")
-            with col_hold:
-                st.markdown("#### 🟡 관망/보유 시그널 종목")
-                if hold_tickers:
-                    for t in hold_tickers:
-                        # get_signal_symbol 함수가 HTML을 반환하므로 unsafe_allow_html=True 설정
-                        st.markdown(f"- {t} {get_signal_symbol('관망')} - {TICKER_DESCRIPTIONS.get(t, '설명 없음')}", unsafe_allow_html=True)
-                else:
-                    st.write("없음")
-        else:
-            st.info("시그널을 분석할 수 있는 종목 데이터가 부족합니다.")
+            if not df_with_indicators.empty:
+                # 스마트 시그널 적용
+                df_with_indicators['TradeSignal'] = "관망"
+                for i in range(2, len(df_with_indicators)): # 최소 3개 봉 필요 (현재, 이전, 이전2)
+                    current_row = df_with_indicators.iloc[i]
+                    prev_row = df_with_indicators.iloc[i-1]
+                    prev2_row = df_with_indicators.iloc[i-2]
+                    df_with_indicators.loc[df_with_indicators.index[i], 'TradeSignal'] = smart_signal_row(current_row, prev_row, prev2_row)
 
-        st.markdown("---")
+                last_row = df_with_indicators.iloc[-1]
+                prev_row_for_score = df_with_indicators.iloc[-2] if len(df_with_indicators) >= 2 else last_row # Fallback for prev_row
 
-        # --- 오늘의 종목별 매매 전략 요약 ---
-        if summary_rows:
-            st.subheader("📋 오늘의 종목별 매매 전략 요약")
-            st.markdown("""
-            - **'신규 매수'**: 포트폴리오 분배 자산의 권장 비율만큼 신규 진입을 고려합니다.
-            - **'익절 매도'**: 보유 주식의 권장 비율만큼을 수익 실현을 위해 매도하는 것을 권장합니다.
-            - **'매도'**: 보유 주식의 권장 비율만큼을 매도하여 리스크를 줄이는 것을 권장합니다.
-            - **'전량 매도'**: 보유 주식 전체를 매도하여 포지션을 정리하는 것을 권장합니다.
-            - **'관망'**: 현재 포지션을 유지하거나 시장의 추가적인 신호를 기다리는 것을 권장합니다.
-            """)
-            df_summary = pd.DataFrame(summary_rows)
-            st.dataframe(df_summary, use_container_width=True)
-            st.markdown("---")
+                current_price = last_row['Close']
+                previous_close = df_with_indicators['Close'].iloc[-2] if len(df_with_indicators) >= 2 else np.nan
+                daily_change = current_price - previous_close if not np.isnan(previous_close) else np.nan
+                daily_change_pct = (daily_change / previous_close) * 100 if not np.isnan(previous_close) else np.nan
 
-        # --- 각 종목별 상세 지표 및 차트 ---
-        for ticker in TICKERS:
-            if ticker in all_ticker_data:
-                data_for_ticker = all_ticker_data[ticker]
-                df = data_for_ticker['df']
-                last = data_for_ticker['last']
-                signal = data_for_ticker['signal']
-                action = data_for_ticker['action']
-                pct = data_for_ticker['pct']
-                score = data_for_ticker['score']
-                per = data_for_ticker['per'] # PER 가져오기
-                market_cap = data_for_ticker['market_cap'] # 시가총액 가져오기
-                forward_pe = data_for_ticker['forward_pe'] # 선행 PER 가져오기
-                debt_to_equity = data_for_ticker['debt_to_equity'] # 부채비율 가져오기
+                # Yahoo Finance에서 추가 정보 가져오기 (PER, 시가총액, 선행PER, 부채비율)
+                ticker_info = yf.Ticker(selected_ticker).info
+                per = ticker_info.get('trailingPE', np.nan)
+                market_cap = ticker_info.get('marketCap', np.nan)
+                forward_pe = ticker_info.get('forwardPE', np.nan)
+                debt_to_equity = ticker_info.get('debtToEquity', np.nan) # 부채비율 (Debt/Equity)
 
-                # 티커 설명 추가 (추천 행동 위에 위치)
-                st.write(f"**{TICKER_DESCRIPTIONS.get(ticker, '설명 없음')}**")
-                # 시그널 기호와 텍스트를 별도의 markdown으로 표시
-                st.subheader(f"📊 {ticker} 시그널 (오늘 종가: **${last['Close']:.2f}**)")
-                st.markdown(f"{get_signal_symbol(signal)} {get_display_signal_text(signal)}", unsafe_allow_html=True)
+                # 시그널 완화 및 점수 조정
+                original_signal = smart_signal(df_with_indicators)
+                softened_signal = soften_signal(original_signal, market_condition)
                 
-                st.write(f"**추천 행동**: **{action}**")
-                st.write(f"**추천정도**: **{score:.1f}/100**")
+                recommendation_score = compute_recommendation_score(last_row, prev_row_for_score, per, market_cap, forward_pe, debt_to_equity)
+                adjusted_recommendation_score = adjust_score(recommendation_score, market_condition)
+
+                action_text, percentage_value = get_action_and_percentage_by_score(softened_signal, adjusted_recommendation_score)
+
+                # BB 돌파 여부 확인 및 시그널 텍스트에 추가
+                is_bb_up_breakout = last_row['BB_Squeeze_Up_Breakout']
+                is_bb_down_breakout = last_row['BB_Squeeze_Down_Breakout']
+                display_signal_text_base, bb_indicator_text = get_display_signal_text(softened_signal, is_bb_up_breakout, is_bb_down_breakout)
+
+                st.write(f"**현재가:** ${current_price:.2f}")
+                change_color = "green" if daily_change >= 0 else "red"
+                st.markdown(f"**일일 변동:** <span style='color:{change_color}'>{daily_change:+.2f} ({daily_change_pct:+.2f}%)</span>", unsafe_allow_html=True)
+                st.markdown(f"**최근 추천 시그널:** {get_signal_symbol(softened_signal)} {display_signal_text_base}{bb_indicator_text}", unsafe_allow_html=True)
+                st.write(f"**추천 점수 (0-100):** {int(adjusted_recommendation_score)}")
+                st.write(f"**권장 행동:** {action_text}")
 
                 st.markdown("---")
-                st.subheader(f"{ticker} 최근 지표")
-                
-                # 추천 점수 아래에 기본 정보 별도 표시
-                st.markdown(f"""
-                    <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;">
-                        <div><strong>PER:</strong> {per:.2f}</div>
-                        <div><strong>시가총액:</strong> {market_cap/1_000_000_000:.2f}B</div>
-                        <div><strong>선행PER:</strong> {forward_pe:.2f}</div>
-                        <div><strong>부채비율:</strong> {debt_to_equity:.2f}</div>
-                    </div>
-                """, unsafe_allow_html=True)
-
-                # 메인 데이터프레임 표시 컬럼 (기술적 지표만)
-                display_cols = ['Close', 'MA20', 'MACD', 'Signal', 'MACD_Hist', 'RSI', 'ATR', 'ADX', '+DI14', '-DI14', 'Volume', 'Volume_MA20', 'TradeSignal', '%K', '%D', 'CCI', 'BB_Squeeze_Up_Breakout', 'BB_Squeeze_Down_Breakout']
-                
-                st.dataframe(df.tail(7)[display_cols])
-                st.markdown("---")
+                st.subheader("📈 캔들스틱 차트 및 기술적 지표")
 
                 # 캔들스틱 차트
-                fig = go.Figure(data=[go.Candlestick(
-                    x=df.index,
-                    open=df['Open'],
-                    high=df['High'],
-                    low=df['Low'],
-                    close=df['Close']
-                )])
-                fig.update_layout(title=f'{ticker} 캔들스틱 차트', xaxis_rangeslider_visible=False)
+                fig = go.Figure(data=[go.Candlestick(x=df_with_indicators.index,
+                                                    open=df_with_indicators['Open'],
+                                                    high=df_with_indicators['High'],
+                                                    low=df_with_indicators['Low'],
+                                                    close=df_with_indicators['Close'],
+                                                    name='Candlestick')])
+                # 이동평균선 추가
+                fig.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['MA20'], mode='lines', name='MA20', line=dict(color='blue', width=1)))
+                fig.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['MA60'], mode='lines', name='MA60', line=dict(color='orange', width=1)))
+                fig.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['MA120'], mode='lines', name='MA120', line=dict(color='purple', width=1)))
+
+                # 볼린저 밴드 추가
+                fig.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['BB_Upper'], mode='lines', name='BB Upper', line=dict(color='gray', width=1, dash='dash')))
+                fig.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['BB_Middle'], mode='lines', name='BB Middle', line=dict(color='gray', width=1)))
+                fig.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['BB_Lower'], mode='lines', name='BB Lower', line=dict(color='gray', width=1, dash='dash')))
+
+                fig.update_layout(xaxis_rangeslider_visible=False, title=f'{selected_ticker} 주가 차트', height=600)
                 st.plotly_chart(fig, use_container_width=True)
 
-                rsi_val = float(last.get('RSI', np.nan))
-                macd_val = float(last.get('MACD', np.nan))
-                macd_hist_val = float(last.get('MACD_Hist', np.nan))
-                signal_line_val = float(last.get('Signal', np.nan))
-                atr_val = float(last.get('ATR', np.nan))
-                adx_val = float(last.get('ADX', np.nan))
-                k_stoch_val = float(last.get('%K', np.nan))
-                d_stoch_val = float(last.get('%D', np.nan))
-                cci_val = float(last.get('CCI', np.nan))
+                # MACD 차트
+                st.subheader("MACD")
+                fig_macd = go.Figure()
+                fig_macd.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['MACD'], mode='lines', name='MACD Line', line=dict(color='blue')))
+                fig_macd.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['Signal'], mode='lines', name='Signal Line', line=dict(color='red')))
+                fig_macd.add_trace(go.Bar(x=df_with_indicators.index, y=df_with_indicators['MACD_Hist'], name='MACD Histogram', marker_color='green'))
+                fig_macd.update_layout(height=300)
+                st.plotly_chart(fig_macd, use_container_width=True)
 
+                # RSI 차트
+                st.subheader("RSI")
+                fig_rsi = go.Figure()
+                fig_rsi.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['RSI'], mode='lines', name='RSI', line=dict(color='purple')))
+                fig_rsi.add_hline(y=70, line_dash="dash", line_color="red", annotation_text="과매수")
+                fig_rsi.add_hline(y=30, line_dash="dash", line_color="green", annotation_text="과매도")
+                fig_rsi.update_layout(height=300)
+                st.plotly_chart(fig_rsi, use_container_width=True)
 
-                all_tech_summaries_text.append(generate_chatgpt_prompt(ticker, rsi_val, macd_val, macd_hist_val, signal_line_val, atr_val, adx_val, k_stoch_val, d_stoch_val, cci_val, per, market_cap, forward_pe, debt_to_equity))
-            
-        # --- AI 기술적 분석 프롬프트 ---
-        if all_tech_summaries_text:
-            st.subheader("🧠 AI에게 물어보는 기술적 분석 프롬프트")
-            
-            ai_prompt_template = """
-아래 각 종목의 기술적 지표만 보고, 
-미국 주식 전문 트레이더처럼 매수/매도/익절/보유/관망 시그널과 
-매수/매도/익절이 필요한 경우 “몇 % 정도” 하면 좋을지도 같이 구체적으로 알려줘.
+                # Stochastic 차트
+                st.subheader("Stochastic Oscillator")
+                fig_stoch = go.Figure()
+                fig_stoch.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['%K'], mode='lines', name='%K', line=dict(color='blue')))
+                fig_stoch.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['%D'], mode='lines', name='%D', line=dict(color='red')))
+                fig_stoch.add_hline(y=80, line_dash="dash", line_color="red", annotation_text="과매수")
+                fig_stoch.add_hline(y=20, line_dash="dash", line_color="green", annotation_text="과매도")
+                fig_stoch.update_layout(height=300)
+                st.plotly_chart(fig_stoch, use_container_width=True)
 
-- 한 종목당 한 줄씩, 
-- 신호와 추천 비율(%)만 간단명료하게 
-- 사유도 한 줄로 덧붙여줘.
+                # CCI 차트
+                st.subheader("Commodity Channel Index (CCI)")
+                fig_cci = go.Figure()
+                fig_cci.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['CCI'], mode='lines', name='CCI', line=dict(color='teal')))
+                fig_cci.add_hline(y=100, line_dash="dash", line_color="red", annotation_text="과매수")
+                fig_cci.add_hline(y=-100, line_dash="dash", line_color="green", annotation_text="과매도")
+                fig_cci.update_layout(height=300)
+                st.plotly_chart(fig_cci, use_container_width=True)
 
-**[질문]**
-- 각 종목별로 
-  1) 매수/매도/익절/보유/관망 중 뭐가 적합한지 
-  2) 추천 비율(%)은 얼마나 할지 (예: “익절 30%” “신규매수 50%” 등) 
-  3) 근거 한 줄
+                # ADX 차트
+                st.subheader("Average Directional Index (ADX)")
+                fig_adx = go.Figure()
+                fig_adx.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['ADX'], mode='lines', name='ADX', line=dict(color='black')))
+                fig_adx.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['+DI14'], mode='lines', name='+DI14', line=dict(color='green')))
+                fig_adx.add_trace(go.Scatter(x=df_with_indicators.index, y=df_with_indicators['-DI14'], mode='lines', name='-DI14', line=dict(color='red')))
+                fig_adx.add_hline(y=25, line_dash="dash", line_color="gray", annotation_text="강한 추세")
+                fig_adx.update_layout(height=300)
+                st.plotly_chart(fig_adx, use_container_width=True)
 
-아래 표로 정리해서 답변해줘.
+                st.markdown("---")
+                st.subheader("📋 주요 지표 요약 (최근 값)")
+                col_sum1, col_sum2, col_sum3 = st.columns(3)
+                with col_sum1:
+                    st.write(f"**MACD:** {last_row['MACD']:.2f}")
+                    st.write(f"**MACD Signal:** {last_row['Signal']:.2f}")
+                    st.write(f"**MACD Hist:** {last_row['MACD_Hist']:.2f}")
+                    st.write(f"**RSI:** {last_row['RSI']:.2f}")
+                    st.write(f"**Stoch %K:** {last_row['%K']:.2f}")
+                with col_sum2:
+                    st.write(f"**Stoch %D:** {last_row['%D']:.2f}")
+                    st.write(f"**CCI:** {last_row['CCI']:.2f}")
+                    st.write(f"**ADX:** {last_row['ADX']:.2f}")
+                    st.write(f"**+DI14:** {last_row['+DI14']:.2f}")
+                    st.write(f"**-DI14:** {last_row['-DI14']:.2f}")
+                with col_sum3:
+                    st.write(f"**MA20:** {last_row['MA20']:.2f}")
+                    st.write(f"**MA60:** {last_row['MA60']:.2f}")
+                    st.write(f"**MA120:** {last_row['MA120']:.2f}")
+                    st.write(f"**PER:** {per:.2f}" if not np.isnan(per) else "**PER:** N/A")
+                    st.write(f"**시가총액:** {market_cap/1_000_000_000:.2f}B" if not np.isnan(market_cap) else "**시가총액:** N/A")
+                    st.write(f"**선행PER:** {forward_pe:.2f}" if not np.isnan(forward_pe) else "**선행PER:** N/A")
+                    st.write(f"**부채비율:** {debt_to_equity:.2f}" if not np.isnan(debt_to_equity) else "**부채비율:** N/A")
 
-| 종목 | 추천액션 | 비율(%) | 근거 요약 |
-|------|----------------|---------|-----------------------------|
-"""
-            
-            full_ai_prompt_content = ai_prompt_template + "\n" + "\n".join(all_tech_summaries_text)
+                # ChatGPT 프롬프트 생성 및 표시
+                st.markdown("---")
+                st.subheader("🤖 ChatGPT 분석용 프롬프트")
+                chatgpt_prompt = generate_chatgpt_prompt(
+                    selected_ticker,
+                    last_row['RSI'],
+                    last_row['MACD'],
+                    last_row['MACD_Hist'],
+                    last_row['Signal'],
+                    last_row['ATR'],
+                    last_row['ADX'],
+                    last_row['%K'],
+                    last_row['%D'],
+                    last_row['CCI'],
+                    per,
+                    market_cap,
+                    forward_pe,
+                    debt_to_equity
+                )
+                st.code(chatgpt_prompt, language='text')
+                st.info("위 텍스트를 복사하여 ChatGPT에 붙여넣어 추가 분석을 요청할 수 있습니다.")
 
-            st.code(full_ai_prompt_content, language='markdown', line_numbers=False)
-            st.markdown("👆 위 프롬프트 내용 옆 **'Copy to clipboard' 버튼**을 클릭하여 쉽게 복사할 수 있습니다.")
+            else:
+                st.warning("선택된 종목의 기술적 지표를 계산할 충분한 데이터가 없습니다. 다른 종목을 선택하거나 기간을 조정해 보세요.")
+        else:
+            st.info("선택된 종목의 데이터를 불러올 수 없습니다. 티커를 확인해 주세요.")
+
