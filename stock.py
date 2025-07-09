@@ -688,16 +688,24 @@ def get_conviction_score_for_display(signal, raw_score):
     해당 행동에 대한 '확신 정도'를 0-100 사이의 값으로 표현합니다.
     관망/보유 시그널일 경우, 원본 점수가 이미 해당 상태의 '질'을 반영하므로 그대로 사용합니다.
     """
+    max_conviction_cap = 95 # 최대 확신 점수 상한선
+    min_conviction_cap = 5  # 최소 확신 점수 하한선
+
     if "매수" in signal or "반등 가능성" in signal:
         # 매수 시그널: 점수가 높을수록 매수에 대한 확신이 높음
-        return raw_score
+        # 50점 미만은 매수 확신이 약하다고 볼 수 있으므로 하한선 적용
+        # 95점 초과는 너무 극단적이므로 상한선 적용
+        return max(min_conviction_cap, min(max_conviction_cap, raw_score))
     elif "매도" in signal or "익절 매도" in signal or "하락 가능성" in signal:
         # 매도 시그널: 점수가 낮을수록 매도에 대한 확신이 높으므로, 100에서 빼서 반전
-        return 100 - raw_score
+        # 100 - raw_score 값이 50점 미만은 매도 확신이 약하다고 볼 수 있으므로 하한선 적용
+        # 95점 초과는 너무 극단적이므로 상한선 적용
+        return max(min_conviction_cap, min(max_conviction_cap, 100 - raw_score))
     else: # 관망, 보유, 반전 신호 등
         # 관망/보유 시그널: 원본 점수 자체가 해당 관망/보유의 '질'을 나타냄.
         # 예를 들어, 50이면 중립적 관망, 60이면 긍정적 보유, 40이면 부정적 관망.
-        return raw_score
+        # 이 경우에도 너무 극단적인 점수는 피하도록 범위 제한
+        return max(min_conviction_cap, min(max_conviction_cap, raw_score))
 
 # --- ChatGPT 프롬프트 생성 ---
 def generate_chatgpt_prompt(ticker, rsi, macd, macd_hist, signal_line, atr, adx, k_stoch, d_stoch, cci, per, market_cap, forward_pe, debt_to_equity):
