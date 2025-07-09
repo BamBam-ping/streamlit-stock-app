@@ -410,6 +410,41 @@ def main():
         with col_dxy: st.markdown(f"**달러인덱스 (DXY)**<br>{format_macro_metric(macro_data.get('DXY', {}))}", unsafe_allow_html=True)
 
         st.markdown("---")
+        st.subheader("📊 전체 종목별 매매 시그널 현황")
+
+        buy_tickers, sell_tickers, hold_tickers = [], [], []
+        for ticker, d in all_ticker_data.items():
+            sig = d['signal']
+            if "매수" in sig or "반등 가능성" in sig: buy_tickers.append(ticker)
+            elif "매도" in sig or "하락 가능성" in sig or "익절 매도" in sig: sell_tickers.append(ticker)
+            else: hold_tickers.append(ticker)
+        col_buy, col_sell, col_hold = st.columns(3)
+        with col_buy:
+            st.markdown("#### ✅ 매수 시그널 종목")
+            if buy_tickers:
+                for t in buy_tickers:
+                    st.markdown(f"- {t} {get_signal_symbol('매수')} - {TICKER_DESCRIPTIONS.get(t, '설명 없음')}", unsafe_allow_html=True)
+            else: st.write("없음")
+        with col_sell:
+            st.markdown("#### 🔻 매도 시그널 종목")
+            if sell_tickers:
+                for t in sell_tickers:
+                    st.markdown(f"- {t} {get_signal_symbol('매도')} - {TICKER_DESCRIPTIONS.get(t, '설명 없음')}", unsafe_allow_html=True)
+            else: st.write("없음")
+        with col_hold:
+            st.markdown("#### 🟡 관망/보유 시그널 종목")
+            if hold_tickers:
+                for t in hold_tickers:
+                    st.markdown(f"- {t} {get_signal_symbol('관망')} - {TICKER_DESCRIPTIONS.get(t, '설명 없음')}", unsafe_allow_html=True)
+            else: st.write("없음")
+
+
+        st.markdown("---")
+
+        
+
+
+        
         summary_rows, all_tech_summaries_text, all_ticker_data = [], [], {}
         for ticker in TICKERS:
             data = get_ticker_history(ticker, START_DATE, END_DATE)
