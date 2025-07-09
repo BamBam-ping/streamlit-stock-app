@@ -320,6 +320,9 @@ def is_volume_surge(current_row):
 
 def is_bullish_divergence(prev_row, current_row, prev2_row):
     """강세 다이버전스 발생 여부를 확인합니다. (가격은 하락, RSI는 상승)"""
+    # 데이터가 충분하지 않으면 False 반환
+    if prev2_row is None or pd.isna(prev2_row['Low']) or pd.isna(prev2_row['RSI']):
+        return False
     price_low_decreasing = current_row['Low'] < prev_row['Low'] and prev_row['Low'] < prev2_row['Low']
     rsi_low_increasing = current_row['RSI'] > prev_row['RSI'] and prev_row['RSI'] > prev2_row['RSI']
     # RSI가 과매도권 근처에서 발생 시 신뢰도 증가
@@ -327,6 +330,9 @@ def is_bullish_divergence(prev_row, current_row, prev2_row):
 
 def is_bearish_divergence(prev_row, current_row, prev2_row):
     """약세 다이버전스 발생 여부를 확인합니다. (가격은 상승, RSI는 하락)"""
+    # 데이터가 충분하지 않으면 False 반환
+    if prev2_row is None or pd.isna(prev2_row['High']) or pd.isna(prev2_row['RSI']):
+        return False
     price_high_increasing = current_row['High'] > prev_row['High'] and prev_row['High'] > prev2_row['High']
     rsi_high_decreasing = current_row['RSI'] < prev_row['RSI'] and prev_row['RSI'] < prev2_row['RSI']
     # RSI가 과매수권 근처에서 발생 시 신뢰도 증가
@@ -381,31 +387,35 @@ def is_cci_overbought(current_row):
 def smart_signal_row(row, prev_row, prev2_row):
     """개별 행에 대한 스마트 매매 시그널을 생성합니다."""
     # 필수 지표 확인 (NaN 값 처리)
-    required_indicators = ['MACD', 'Signal', 'MACD_Hist', 'RSI', 'MA20', 'Volume_MA20', 'ATR', 'ADX', '%K', '%D', 'CCI', 'BB_Squeeze_Up_Breakout', 'BB_Squeeze_Down_Breakout']
+    required_indicators = ['MACD', 'Signal', 'MACD_Hist', 'RSI', 'MA20', 'Volume_MA20', 'ATR', 'ADX', '%K', '%D', 'CCI', 'BB_Squeeze_Up_Breakout', 'BB_Squeeze_Down_Breakout', 'MA60', 'MA120'] # Add MA60, MA120
     if any(pd.isna(row[ind]) for ind in required_indicators):
-        return "관망"
+        return "데이터 부족" # Changed from "관망" for clarity when data is truly missing
 
     current_close = row['Close']
     prev_close = prev_row['Close']
     macd_hist_direction = row['MACD_Hist'] - prev_row['MACD_Hist']
 
     # 1. 강력 매수/매도 시그널 (복합 지표, 최우선)
-    # 강력 매수: MACD 골든크로스 + MA20 상향 돌파 + 거래량 급증 + 추세 강세 (ADX > 25, +DI > -DI) + 스토캐스틱 골든크로스 + RSI 과매도 탈출
+    # 강력 매수: MACD 골든크로스 + MA20 상향 돌파 + 거래량 급증 + 추세 강세 (ADX > 25, +DI > -DI) + 스토캐스틱 골든크로스 + RSI 과매도 탈출 + 정배열 초기 진입
     if (is_macd_golden_cross(prev_row, row) and
         is_ma_cross_up(prev_row, row) and
         is_volume_surge(row) and
         row['ADX'] > 25 and row['+DI14'] > row['-DI14'] and
         is_stoch_golden_cross(prev_row, row) and
-        prev_row['RSI'] <= 30 and row['RSI'] > 30):
+        prev_row['RSI'] <= 30 and row['RSI'] > 30 and
+        # 추가된 MA 정배열 조건: MA20이 MA60 위에 있고, MA60이 MA120 위에 있는 초기 단계
+        row['MA20'] > row['MA60'] and row['MA60'] > row['MA120'] and prev_row['MA20'] <= prev_row['MA60']): 
         return "강력 매수"
 
-    # 강력 매도: MACD 데드크로스 + MA20 하향 돌파 + 거래량 급증 + 추세 약세 (ADX > 25, +DI < -DI) + 스토캐스틱 데드크로스 + RSI 과매수 탈출
+    # 강력 매도: MACD 데드크로스 + MA20 하향 돌파 + 거래량 급증 + 추세 약세 (ADX > 25, +DI < -DI) + 스토캐스틱 데드크로스 + RSI 과매수 탈출 + 역배열 초기 진입
     if (is_macd_dead_cross(prev_row, row) and
         is_ma_cross_down(prev_row, row) and
         is_volume_surge(row) and
         row['ADX'] > 25 and row['+DI14'] < row['-DI14'] and
         is_stoch_dead_cross(prev_row, row) and
-        prev_row['RSI'] >= 70 and row['RSI'] < 70):
+        prev_row['RSI'] >= 70 and row['RSI'] < 70 and
+        # 추가된 MA 역배열 조건: MA20이 MA60 아래에 있고, MA60이 MA120 아래에 있는 초기 단계
+        row['MA20'] < row['MA60'] and row['MA60'] < row['MA120'] and prev_row['MA20'] >= prev_row['MA60']):
         return "강력 매도"
 
     # 2. 볼린저 밴드 스퀴즈 돌파 (강력한 추세 전환/시작)
@@ -465,6 +475,11 @@ def smart_signal_row(row, prev_row, prev2_row):
         if row['RSI'] < 30: return "신규 매수"
         else: return "관망"
 
+    # New: Consolidation/Sideways
+    # ADX가 약하고, 볼린저 밴드 폭이 좁은 경우 (횡보)
+    if row['ADX'] < 20 and (row['BB_Upper'] - row['BB_Lower']) < (row['BB_Middle'] * 0.05):
+        return "횡보/관망"
+
     # 그 외
     return "관망"
 
@@ -477,7 +492,7 @@ def smart_signal(df_with_signals):
     return last_valid_signal
 
 # --- 추천 정도 계산 ---
-def compute_recommendation_score(last, prev_row, per, market_cap, forward_pe, debt_to_equity):
+def compute_recommendation_score(last, prev_row, prev2_row, per, market_cap, forward_pe, debt_to_equity):
     """주어진 지표와 시장 상황에 따라 종목의 추천 점수를 계산합니다."""
     score = 50 # 기본 점수
 
@@ -610,7 +625,7 @@ def compute_recommendation_score(last, prev_row, per, market_cap, forward_pe, de
         score -= 30
     elif "매도" in last['TradeSignal'] or "익절 매도" in last['TradeSignal'] or "매도 고려" in last['TradeSignal'] or "하락 가능성" in last['TradeSignal']:
         score -= 15
-    elif "관망" in last['TradeSignal'] or "보유" in last['TradeSignal'] or "반전 신호" in last['TradeSignal']:
+    elif "관망" in last['TradeSignal'] or "보유" in last['TradeSignal'] or "반전 신호" in last['TradeSignal'] or "횡보/관망" in last['TradeSignal']: # Added "횡보/관망"
         # 관망/보유 시그널일 때 점수 범위 제한
         score = max(score, 40) if score > 50 else min(score, 60)
 
@@ -619,6 +634,28 @@ def compute_recommendation_score(last, prev_row, per, market_cap, forward_pe, de
         score += 20
     if last['BB_Squeeze_Down_Breakout']:
         score -= 20
+
+    # New: Bollinger Band Position Scoring
+    # 종가가 하단 밴드를 돌파 (과매도 상태, 매수 기회)
+    if last['Close'] < last['BB_Lower']: 
+        score += 15 
+    # 종가가 상단 밴드를 돌파 (과매수 상태, 매도 기회)
+    elif last['Close'] > last['BB_Upper']: 
+        score -= 15 
+    # 종가가 중간 밴드 아래 (약세 영역)
+    elif last['Close'] < last['BB_Middle']: 
+        score += 5
+    # 종가가 중간 밴드 위 (강세 영역)
+    elif last['Close'] > last['BB_Middle']: 
+        score -= 5
+
+    # New: Divergence Scoring (requires prev2_row)
+    # prev2_row가 유효한 경우에만 다이버전스 체크
+    if prev2_row is not None: 
+        if is_bullish_divergence(prev2_row, prev_row, last):
+            score += 15
+        if is_bearish_divergence(prev2_row, prev_row, last):
+            score -= 15
     
     # 점수 정규화 (0-100)
     score = max(0, min(100, score))
@@ -653,7 +690,7 @@ def get_action_and_percentage_by_score(signal, score):
     elif "강력 매도" in signal:
         action_base = "전량 매도"
         percentage = 80 + (80 - score) * 0.5 if score < 80 else 80
-    elif "보유" in signal or "관망" in signal or "반전 신호" in signal:
+    elif "보유" in signal or "관망" in signal or "반전 신호" in signal or "횡보/관망" in signal: # Added "횡보/관망"
         action_base = "관망"
         percentage = 0
 
@@ -688,6 +725,8 @@ def get_display_signal_text(signal_original):
         return "강력 상승추세 가능성"
     elif signal_original == "강력 매도":
         return "강력 하락추세 가능성"
+    elif signal_original == "횡보/관망":
+        return "횡보 구간, 관망 필요"
     return signal_original
 
 # --- 추천 행동에 대한 확신 정도 점수 계산 ---
@@ -711,7 +750,7 @@ def get_conviction_score_for_display(signal, raw_score):
         # 100 - raw_score 값이 50점 미만은 매도 확신이 약하다고 볼 수 있으므로 하한선 적용
         # 95점 초과는 너무 극단적이므로 상한선 적용
         return max(min_conviction_cap, min(max_conviction_cap, 100 - raw_score))
-    else: # 관망, 보유, 반전 신호 등
+    else: # 관망, 보유, 반전 신호, 횡보/관망 등
         # 관망/보유 시그널: 원본 점수 자체가 해당 관망/보유의 '질'을 나타냄.
         # 예를 들어, 50이면 중립적 관망, 60이면 긍정적 보유, 40이면 부정적 관망.
         # 이 경우에도 너무 극단적인 점수는 피하도록 범위 제한
@@ -721,7 +760,10 @@ def get_conviction_score_for_display(signal, raw_score):
 def calculate_sector_scores(all_ticker_data, market_condition):
     """섹터별 점수를 계산합니다. 각 섹터 내 종목들의 평균 점수를 사용하고 시장 상황에 따라 조정합니다."""
     sector_scores = {}
+    # ETF 섹터를 제외하고 반복
     for sector_name, tickers_in_sector in SECTORS.items():
+        if sector_name == "ETF": # Exclude ETF from sector scoring
+            continue
         total_score = 0
         count = 0
         for ticker in tickers_in_sector:
@@ -882,6 +924,7 @@ if __name__ == '__main__':
 
                 last = df.iloc[-1]
                 prev_row = df.iloc[-2]
+                prev2_row = df.iloc[-3] if len(df) >= 3 else None # prev2_row 추가
 
                 # 기본 정보 가져오기
                 info = ticker_obj.info
@@ -894,7 +937,7 @@ if __name__ == '__main__':
                 signal = soften_signal(signal, market_condition)
                 df.loc[df.index[-1], 'TradeSignal'] = signal # 최종 시그널 업데이트
 
-                score = compute_recommendation_score(last, prev_row, per, market_cap, forward_pe, debt_to_equity)
+                score = compute_recommendation_score(last, prev_row, prev2_row, per, market_cap, forward_pe, debt_to_equity) # prev2_row 전달
                 score = adjust_score(score, market_condition) # 거시경제에 따른 점수 조정
                 
                 # '추천 정도'를 행동에 대한 확신 정도로 변환
@@ -1027,6 +1070,7 @@ if __name__ == '__main__':
 
                 last = df.iloc[-1]
                 prev_row = df.iloc[-2]
+                prev2_row = df.iloc[-3] if len(df) >= 3 else None # prev2_row 추가
 
                 # 기본 정보 가져오기
                 info = ticker_obj.info
@@ -1039,7 +1083,7 @@ if __name__ == '__main__':
                 signal = soften_signal(signal, market_condition) # 거시경제 필터링 적용
                 df.loc[df.index[-1], 'TradeSignal'] = signal # 최종 시그널 업데이트
 
-                score = compute_recommendation_score(last, prev_row, per, market_cap, forward_pe, debt_to_equity)
+                score = compute_recommendation_score(last, prev_row, prev2_row, per, market_cap, forward_pe, debt_to_equity) # prev2_row 전달
                 score = adjust_score(score, market_condition) # 거시경제에 따른 점수 조정
                 action, pct = get_action_and_percentage_by_score(signal, score)
                 
@@ -1080,11 +1124,21 @@ if __name__ == '__main__':
         # 점수가 높은 순서대로 정렬
         sorted_sector_scores = sorted(sector_scores.items(), key=lambda item: item[1] if not np.isnan(item[1]) else -1, reverse=True)
 
-        for sector_name, score in sorted_sector_scores:
-            if not np.isnan(score):
-                st.write(f"- **{sector_name}**: {score:.1f}점")
-            else:
-                st.write(f"- **{sector_name}**: 데이터 부족")
+        # Create columns for horizontal display
+        # Determine number of columns dynamically based on number of non-ETF sectors
+        num_non_etf_sectors = len([s for s in SECTORS if s != "ETF"])
+        
+        # Ensure there's at least one column to avoid error if no non-ETF sectors are defined/valid
+        if num_non_etf_sectors > 0:
+            cols = st.columns(num_non_etf_sectors)
+            col_idx = 0
+            for sector_name, score in sorted_sector_scores:
+                if not np.isnan(score):
+                    with cols[col_idx]:
+                        st.markdown(f"**{sector_name}**<br>{score:.1f}점", unsafe_allow_html=True)
+                    col_idx += 1 # Move to the next column
+        else:
+            st.info("섹터별 투자 매력도 데이터를 가져올 수 없습니다.")
         st.markdown("---")
 
         # --- 매수/매도/관망 종목 목록 표시 ---
