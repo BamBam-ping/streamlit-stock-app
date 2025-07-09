@@ -680,6 +680,25 @@ def get_display_signal_text(signal_original):
         return "강력 하락추세 가능성"
     return signal_original
 
+# --- 추천 행동에 대한 확신 정도 점수 계산 ---
+def get_conviction_score_for_display(signal, raw_score):
+    """
+    주어진 시그널과 원본 점수를 바탕으로 '추천 정도'를 계산합니다.
+    매수 시그널일 때는 원본 점수를, 매도 시그널일 때는 원본 점수를 반전하여,
+    해당 행동에 대한 '확신 정도'를 0-100 사이의 값으로 표현합니다.
+    관망/보유 시그널일 경우, 원본 점수가 이미 해당 상태의 '질'을 반영하므로 그대로 사용합니다.
+    """
+    if "매수" in signal or "반등 가능성" in signal:
+        # 매수 시그널: 점수가 높을수록 매수에 대한 확신이 높음
+        return raw_score
+    elif "매도" in signal or "익절 매도" in signal or "하락 가능성" in signal:
+        # 매도 시그널: 점수가 낮을수록 매도에 대한 확신이 높으므로, 100에서 빼서 반전
+        return 100 - raw_score
+    else: # 관망, 보유, 반전 신호 등
+        # 관망/보유 시그널: 원본 점수 자체가 해당 관망/보유의 '질'을 나타냄.
+        # 예를 들어, 50이면 중립적 관망, 60이면 긍정적 보유, 40이면 부정적 관망.
+        return raw_score
+
 # --- ChatGPT 프롬프트 생성 ---
 def generate_chatgpt_prompt(ticker, rsi, macd, macd_hist, signal_line, atr, adx, k_stoch, d_stoch, cci, per, market_cap, forward_pe, debt_to_equity):
     """ChatGPT에 보낼 기술적 지표 프롬프트 문자열을 생성합니다."""
@@ -835,12 +854,15 @@ if __name__ == '__main__':
 
                 score = compute_recommendation_score(last, prev_row, per, market_cap, forward_pe, debt_to_equity)
                 score = adjust_score(score, market_condition) # 거시경제에 따른 점수 조정
+                
+                # '추천 정도'를 행동에 대한 확신 정도로 변환
                 action, pct = get_action_and_percentage_by_score(signal, score)
+                display_score = get_conviction_score_for_display(signal, score) # 수정된 함수 사용
 
                 email_summary_rows.append({
                     "Ticker": ticker,
                     "Signal": signal,
-                    "추천정도": f"{score:.1f}",
+                    "추천정도": f"{display_score:.1f}", # display_score 사용
                     "추천 행동": action,
                 })
 
@@ -978,11 +1000,14 @@ if __name__ == '__main__':
                 score = compute_recommendation_score(last, prev_row, per, market_cap, forward_pe, debt_to_equity)
                 score = adjust_score(score, market_condition) # 거시경제에 따른 점수 조정
                 action, pct = get_action_and_percentage_by_score(signal, score)
+                
+                # '추천 정도'를 행동에 대한 확신 정도로 변환
+                display_score = get_conviction_score_for_display(signal, score) # 수정된 함수 사용
 
                 summary_rows.append({
                     "Ticker": ticker,
                     "Signal": signal,
-                    "추천정도": f"{score:.1f}",
+                    "추천정도": f"{display_score:.1f}", # display_score 사용
                     "추천 행동": action,
                 })
                 all_ticker_data[ticker] = {
@@ -1090,11 +1115,14 @@ if __name__ == '__main__':
                 signal = data_for_ticker['signal']
                 action = data_for_ticker['action']
                 pct = data_for_ticker['pct']
-                score = data_for_ticker['score']
+                score = data_for_ticker['score'] # 원본 score
                 per = data_for_ticker['per'] # PER 가져오기
                 market_cap = data_for_ticker['market_cap'] # 시가총액 가져오기
                 forward_pe = data_for_ticker['forward_pe'] # 선행 PER 가져오기
                 debt_to_equity = data_for_ticker['debt_to_equity'] # 부채비율 가져오기
+
+                # '추천 정도'를 행동에 대한 확신 정도로 변환
+                display_score = get_conviction_score_for_display(signal, score) # 수정된 함수 사용
 
                 # 티커 설명 추가 (추천 행동 위에 위치)
                 st.write(f"**{TICKER_DESCRIPTIONS.get(ticker, '설명 없음')}**")
@@ -1103,7 +1131,7 @@ if __name__ == '__main__':
                 st.markdown(f"{get_signal_symbol(signal)} {get_display_signal_text(signal)}", unsafe_allow_html=True)
                 
                 st.write(f"**추천 행동**: **{action}**")
-                st.write(f"**추천정도**: **{score:.1f}/100**")
+                st.write(f"**추천정도**: **{display_score:.1f}/100**") # display_score 사용
 
                 st.markdown("---")
                 st.subheader(f"{ticker} 최근 지표")
