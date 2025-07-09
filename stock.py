@@ -26,13 +26,25 @@ TICKERS = [
     "ADBE",     # 어도비 (기술/성장, 소프트웨어)
     "LLY",      # 일라이 릴리 (헬스케어/성장, 제약)
     "UNH",      # 유나이티드헬스그룹 (헬스케어/성장, 관리형 건강 서비스)
-    "VRTX",     # 버텍스 파마슈티컬스 (바이오/성장, 제약)
-    "REGN",     # 리제네론 파마슈티컬스 (바이오/성장, 제약)
+    "JNJ",      # 존슨앤존슨 (헬스케어/가치, 필수 소비재, 배당)
+    "PFE",      # 화이자 (헬스케어/가치, 제약)
     "JPM",      # JP모건 체이스 (금융/가치, 은행)
     "V",        # 비자 (기술/성장, 결제 서비스)
     "MS",       # 모건 스탠리 (금융)
-    "JNJ",      # 존슨앤존슨 (헬스케어/가치, 필수 소비재, 배당)
-    "HOOD",     # 로빈후드 (핀테크)
+    "BAC",      # 뱅크오브아메리카 (금융/가치, 은행)
+    "GS",       # 골드만삭스 (금융/가치, 투자은행)
+    "PG",       # 프록터앤드갬블 (필수소비재/가치, 생활용품)
+    "KO",       # 코카콜라 (필수소비재/가치, 음료)
+    "CAT",      # 캐터필러 (산업재/가치, 중장비)
+    "XOM",      # 엑손모빌 (에너지/가치, 석유 및 가스)
+    "NEE",      # 넥스트에라 에너지 (유틸리티/가치, 전력)
+    "SMH",      # VanEck 반도체 ETF (AI/반도체 섹터 대표)
+    "IBB",      # iShares 바이오테크놀로지 ETF (헬스케어/제약 섹터 대표)
+    "XLK",      # Technology Select Sector SPDR Fund (기술/성장 섹터 대표)
+    "XLF",      # Financial Select Sector SPDR Fund (금융/결제 섹터 대표)
+    "XLP",      # Consumer Staples Select Sector SPDR Fund (필수소비재 섹터 대표)
+    "XLI",      # Industrial Select Sector SPDR Fund (산업재 섹터 대표)
+    "XLE",      # Energy Select Sector SPDR Fund (에너지 섹터 대표)
     "SPY",      # SPDR S&P 500 ETF (미국 대형주 시장 전체)
     "QQQ",      # Invesco QQQ Trust (나스닥 100 기술/성장주 중심)
     "SCHD",     # Schwab U.S. Dividend Equity ETF (미국 고배당주)
@@ -53,27 +65,61 @@ TICKER_DESCRIPTIONS = {
     "ADBE": "어도비 (기술/성장, 소프트웨어)",
     "LLY": "일라이 릴리 (헬스케어/성장, 제약)",
     "UNH": "유나이티드헬스그룹 (헬스케어/성장, 관리형 건강 서비스)",
-    "VRTX": "버텍스 파마슈티컬스 (바이오/성장, 제약)",
-    "REGN": "리제네론 파마슈티컬스 (바이오/성장, 제약)",
+    "JNJ": "존슨앤존슨 (헬스케어/가치, 필수 소비재, 배당)",
+    "PFE": "화이자 (헬스케어/가치, 제약)",
     "JPM": "JP모건 체이스 (금융/가치, 은행)",
     "V": "비자 (기술/성장, 결제 서비스)",
     "MS": "모건 스탠리 (금융)",
-    "JNJ": "존슨앤존슨 (헬스케어/가치, 필수 소비재, 배당)",
-    "HOOD": "로빈후드 (핀테크)",
+    "BAC": "뱅크오브아메리카 (금융/가치, 은행)",
+    "GS": "골드만삭스 (금융/가치, 투자은행)",
+    "PG": "프록터앤드갬블 (필수소비재/가치, 생활용품)",
+    "KO": "코카콜라 (필수소비재/가치, 음료)",
+    "CAT": "캐터필러 (산업재/가치, 중장비)",
+    "XOM": "엑손모빌 (에너지/가치, 석유 및 가스)",
+    "NEE": "넥스트에라 에너지 (유틸리티/가치, 전력)",
+    "SMH": "VanEck 반도체 ETF (AI/반도체 섹터 대표)",
+    "IBB": "iShares 바이오테크놀로지 ETF (헬스케어/제약 섹터 대표)",
+    "XLK": "Technology Select Sector SPDR Fund (기술/성장 섹터 대표)",
+    "XLF": "Financial Select Sector SPDR Fund (금융/결제 섹터 대표)",
+    "XLP": "Consumer Staples Select Sector SPDR Fund (필수소비재 섹터 대표)",
+    "XLI": "Industrial Select Sector SPDR Fund (산업재 섹터 대표)",
+    "XLE": "Energy Select Sector SPDR Fund (에너지 섹터 대표)",
     "SPY": "SPDR S&P 500 ETF (미국 대형주 시장 전체)",
     "QQQ": "Invesco QQQ Trust (나스닥 100 기술/성장주 중심)",
     "SCHD": "Schwab U.S. Dividend Equity ETF (미국 고배당주)",
 }
 
-# 섹터 정의 및 해당 티커 매핑
+# 섹터 정의 및 해당 티커 매핑 (개별 종목 기준)
 SECTORS = {
     "AI/반도체": ["NVDA", "AMD", "PANW", "TSM"],
     "기술/성장": ["MSFT", "AAPL", "GOOGL", "AMZN", "TSLA", "ADBE", "ORCL"],
-    "헬스케어/제약": ["LLY", "UNH", "VRTX", "REGN", "JNJ"],
-    "금융/결제": ["JPM", "V", "MS", "HOOD"],
-    "ETF": ["SPY", "QQQ", "SCHD"]
+    "헬스케어/제약": ["LLY", "UNH", "JNJ", "PFE"],
+    "금융/결제": ["JPM", "V", "MS", "BAC", "GS"],
+    "필수소비재": ["PG", "KO"],
+    "산업재/에너지/유틸리티": ["CAT", "XOM", "NEE"],
+    "전체 시장 ETF": ["SPY", "QQQ", "SCHD"] # 일반 ETF는 여기에 유지 (섹터 점수 계산에서 제외)
 }
 
+# 섹터별 대표 ETF 매핑 (섹터 점수 계산에 활용)
+SECTOR_TO_ETF_MAPPING = {
+    "AI/반도체": "SMH",
+    "기술/성장": "XLK",
+    "헬스케어/제약": "IBB",
+    "금융/결제": "XLF",
+    "필수소비재": "XLP",
+    "산업재/에너지/유틸리티": ["XLI", "XLE"], # 산업재와 에너지 ETF를 함께 고려
+}
+
+# 차트 시각화에서 제외할 ETF 목록
+ETFS_TO_EXCLUDE_FROM_CHARTS = list(SECTOR_TO_ETF_MAPPING.values())
+# 중첩 리스트를 평탄화 (예: ["XLI", "XLE"] 처리)
+flat_etfs = []
+for item in ETFS_TO_EXCLUDE_FROM_CHARTS:
+    if isinstance(item, list):
+        flat_etfs.extend(item)
+    else:
+        flat_etfs.append(item)
+ETFS_TO_EXCLUDE_FROM_CHARTS = flat_etfs + SECTORS["전체 시장 ETF"] # 일반 시장 ETF도 제외
 
 END_DATE = datetime.now().strftime("%Y-%m-%d")
 START_DATE = (datetime.now() - timedelta(days=730)).strftime("%Y-%m-%d") # 약 2년치 데이터
@@ -119,7 +165,7 @@ def download_macro_data(start, end):
                 print(f"DEBUG: {name} 데이터가 비어있거나 'Close' 컬럼이 NaN입니다. NaN으로 설정합니다.")
         except Exception as e:
             retrieved_data[name] = {"value": np.nan, "change": np.nan}
-            print(f"ERROR: {name} ({ticker_symbol}) 다운로드 실패. 이유: {e}. 건너뜁니다.")
+            print(f"ERROR: {name} ({ticker_symbol}) 다운로드 실패. 이유: {e}. 건너킵니다.")
     
     # 장단기 금리차 계산 (10년물 - 3개월물)
     us10y_val = retrieved_data.get("US10Y", {}).get("value", np.nan)
@@ -387,9 +433,9 @@ def is_cci_overbought(current_row):
 def smart_signal_row(row, prev_row, prev2_row):
     """개별 행에 대한 스마트 매매 시그널을 생성합니다."""
     # 필수 지표 확인 (NaN 값 처리)
-    required_indicators = ['MACD', 'Signal', 'MACD_Hist', 'RSI', 'MA20', 'Volume_MA20', 'ATR', 'ADX', '%K', '%D', 'CCI', 'BB_Squeeze_Up_Breakout', 'BB_Squeeze_Down_Breakout', 'MA60', 'MA120'] # Add MA60, MA120
+    required_indicators = ['MACD', 'Signal', 'MACD_Hist', 'RSI', 'MA20', 'Volume_MA20', 'ATR', 'ADX', '%K', '%D', 'CCI', 'BB_Squeeze_Up_Breakout', 'BB_Squeeze_Down_Breakout', 'MA60', 'MA120']
     if any(pd.isna(row[ind]) for ind in required_indicators):
-        return "데이터 부족" # Changed from "관망" for clarity when data is truly missing
+        return "데이터 부족"
 
     current_close = row['Close']
     prev_close = prev_row['Close']
@@ -403,7 +449,6 @@ def smart_signal_row(row, prev_row, prev2_row):
         row['ADX'] > 25 and row['+DI14'] > row['-DI14'] and
         is_stoch_golden_cross(prev_row, row) and
         prev_row['RSI'] <= 30 and row['RSI'] > 30 and
-        # 추가된 MA 정배열 조건: MA20이 MA60 위에 있고, MA60이 MA120 위에 있는 초기 단계
         row['MA20'] > row['MA60'] and row['MA60'] > row['MA120'] and prev_row['MA20'] <= prev_row['MA60']): 
         return "강력 매수"
 
@@ -414,7 +459,6 @@ def smart_signal_row(row, prev_row, prev2_row):
         row['ADX'] > 25 and row['+DI14'] < row['-DI14'] and
         is_stoch_dead_cross(prev_row, row) and
         prev_row['RSI'] >= 70 and row['RSI'] < 70 and
-        # 추가된 MA 역배열 조건: MA20이 MA60 아래에 있고, MA60이 MA120 아래에 있는 초기 단계
         row['MA20'] < row['MA60'] and row['MA60'] < row['MA120'] and prev_row['MA20'] >= prev_row['MA60']):
         return "강력 매도"
 
@@ -625,7 +669,7 @@ def compute_recommendation_score(last, prev_row, prev2_row, per, market_cap, for
         score -= 30
     elif "매도" in last['TradeSignal'] or "익절 매도" in last['TradeSignal'] or "매도 고려" in last['TradeSignal'] or "하락 가능성" in last['TradeSignal']:
         score -= 15
-    elif "관망" in last['TradeSignal'] or "보유" in last['TradeSignal'] or "반전 신호" in last['TradeSignal'] or "횡보/관망" in last['TradeSignal']: # Added "횡보/관망"
+    elif "관망" in last['TradeSignal'] or "보유" in last['TradeSignal'] or "반전 신호" in last['TradeSignal'] or "횡보/관망" in last['TradeSignal']:
         # 관망/보유 시그널일 때 점수 범위 제한
         score = max(score, 40) if score > 50 else min(score, 60)
 
@@ -690,7 +734,7 @@ def get_action_and_percentage_by_score(signal, score):
     elif "강력 매도" in signal:
         action_base = "전량 매도"
         percentage = 80 + (80 - score) * 0.5 if score < 80 else 80
-    elif "보유" in signal or "관망" in signal or "반전 신호" in signal or "횡보/관망" in signal: # Added "횡보/관망"
+    elif "보유" in signal or "관망" in signal or "반전 신호" in signal or "횡보/관망" in signal:
         action_base = "관망"
         percentage = 0
 
@@ -760,18 +804,32 @@ def get_conviction_score_for_display(signal, raw_score):
 def calculate_sector_scores(all_ticker_data, market_condition):
     """섹터별 점수를 계산합니다. 각 섹터 내 종목들의 평균 점수를 사용하고 시장 상황에 따라 조정합니다."""
     sector_scores = {}
-    # ETF 섹터를 제외하고 반복
-    for sector_name, tickers_in_sector in SECTORS.items():
-        if sector_name == "ETF": # Exclude ETF from sector scoring
+    for sector_name, individual_tickers_in_sector in SECTORS.items():
+        if sector_name == "전체 시장 ETF": # 일반 ETF 카테고리는 섹터 점수 계산에서 제외
             continue
+        
         total_score = 0
         count = 0
-        for ticker in tickers_in_sector:
+
+        # 1. 섹터 내 개별 종목들의 점수 합산
+        for ticker in individual_tickers_in_sector:
             if ticker in all_ticker_data:
-                # 개별 종목의 원본 점수(raw_score)를 사용
                 raw_stock_score = all_ticker_data[ticker]['score']
                 total_score += raw_stock_score
                 count += 1
+        
+        # 2. 매핑된 섹터 대표 ETF의 점수 합산
+        mapped_etfs = SECTOR_TO_ETF_MAPPING.get(sector_name)
+        if mapped_etfs:
+            # mapped_etfs가 단일 티커 문자열일 수도, 리스트일 수도 있으므로 리스트로 통일
+            if not isinstance(mapped_etfs, list):
+                mapped_etfs = [mapped_etfs]
+            
+            for etf_ticker in mapped_etfs:
+                if etf_ticker in all_ticker_data:
+                    etf_score = all_ticker_data[etf_ticker]['score']
+                    total_score += etf_score
+                    count += 1
         
         if count > 0:
             avg_sector_score = total_score / count
@@ -819,9 +877,9 @@ def send_email(subject, body, to_email, from_email, password, attachments=None):
                 part['Content-Disposition'] = f'attachment; filename="{file_name}"'
                 msg.attach(part)
             except FileNotFoundError:
-                print(f"경고: 첨부 파일 {file_path}를 찾을 수 없습니다. 건너뜁니다.")
+                print(f"경고: 첨부 파일 {file_path}를 찾을 수 없습니다. 건너킵니다.")
             except Exception as e:
-                print(f"경고: 첨부 파일 {file_path} 처리 중 오류 발생: {e}. 건너뜁니다.")
+                print(f"경고: 첨부 파일 {file_path} 처리 중 오류 발생: {e}. 건너킵니다.")
 
     try:
         server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
@@ -879,7 +937,7 @@ if __name__ == '__main__':
                                 f"</span></p>")
         email_body_parts.append(f"<p>- 미 3개월 금리: <b>{macro_data.get('US3M', {}).get('value', 'N/A'):.2f}%</b> "
                                 f"<span style='font-size: 0.8em; color: {'green' if macro_data.get('US3M', {}).get('change', 0) >= 0 else 'red'};'>"
-                                f"({macro_data.get('US3M', {}).get('change', np.nan):+.2f}%)"
+                                f"({macro_data.get('US3M', {}).get('change', np.nan):+.2f})"
                                 f"</span></p>")
         email_body_parts.append(f"<p>- S&P 500: <b>{macro_data.get('S&P500', {}).get('value', 'N/A'):.2f}</b> "
                                 f"<span style='font-size: 0.8em; color: {'green' if macro_data.get('S&P500', {}).get('change', 0) >= 0 else 'red'};'>"
@@ -906,7 +964,7 @@ if __name__ == '__main__':
                 data = ticker_obj.history(start=START_DATE, end=END_DATE, interval="1d")
 
                 if data.empty or not all(col in data.columns for col in ['Open', 'High', 'Low', 'Close', 'Volume']):
-                    print(f"❌ {ticker} 데이터 누락 또는 형식 오류. 건너뜁니다.")
+                    print(f"❌ {ticker} 데이터 누락 또는 형식 오류. 건너킵니다.")
                     continue
 
                 if 'Adj Close' in data.columns:
@@ -915,7 +973,7 @@ if __name__ == '__main__':
                 df = calc_indicators(data[['Open', 'High', 'Low', 'Close', 'Volume']].copy())
 
                 if df.empty or len(df) < MIN_DATA_REQUIRED_FOR_INDICATORS:
-                    print(f"❌ {ticker} 지표 계산 후 데이터 부족 ({len(df)}개). 시그널 생성을 건너뜁니다.")
+                    print(f"❌ {ticker} 지표 계산 후 데이터 부족 ({len(df)}개). 시그널 생성을 건너킵니다.")
                     continue
 
                 df['TradeSignal'] = ["관망"] * len(df)
@@ -924,7 +982,7 @@ if __name__ == '__main__':
 
                 last = df.iloc[-1]
                 prev_row = df.iloc[-2]
-                prev2_row = df.iloc[-3] if len(df) >= 3 else None # prev2_row 추가
+                prev2_row = df.iloc[-3] if len(df) >= 3 else None
 
                 # 기본 정보 가져오기
                 info = ticker_obj.info
@@ -935,19 +993,19 @@ if __name__ == '__main__':
 
                 signal = last['TradeSignal']
                 signal = soften_signal(signal, market_condition)
-                df.loc[df.index[-1], 'TradeSignal'] = signal # 최종 시그널 업데이트
+                df.loc[df.index[-1], 'TradeSignal'] = signal
 
-                score = compute_recommendation_score(last, prev_row, prev2_row, per, market_cap, forward_pe, debt_to_equity) # prev2_row 전달
-                score = adjust_score(score, market_condition) # 거시경제에 따른 점수 조정
+                score = compute_recommendation_score(last, prev_row, prev2_row, per, market_cap, forward_pe, debt_to_equity)
+                score = adjust_score(score, market_condition)
                 
                 # '추천 정도'를 행동에 대한 확신 정도로 변환
                 action, pct = get_action_and_percentage_by_score(signal, score)
-                display_score = get_conviction_score_for_display(signal, score) # 수정된 함수 사용
+                display_score = get_conviction_score_for_display(signal, score)
 
                 email_summary_rows.append({
                     "Ticker": ticker,
                     "Signal": signal,
-                    "추천정도": f"{display_score:.1f}", # display_score 사용
+                    "추천정도": f"{display_score:.1f}",
                     "추천 행동": action,
                 })
 
@@ -965,9 +1023,9 @@ if __name__ == '__main__':
                 email_tech_summaries_text.append(generate_chatgpt_prompt(ticker, rsi_val, macd_val, macd_hist_val, signal_line_val, atr_val, adx_val, k_stoch_val, d_stoch_val, cci_val, per, market_cap, forward_pe, debt_to_equity))
 
             except ValueError as ve:
-                print(f"❌ {ticker} 지표 계산 중 오류 발생: {ve}. 건너뜁니다.")
+                print(f"❌ {ticker} 지표 계산 중 오류 발생: {ve}. 건너킵니다.")
             except Exception as e:
-                print(f"❌ {ticker} 데이터 처리 중 알 수 없는 오류 발생: {e}. 건너뜁니다.")
+                print(f"❌ {ticker} 데이터 처리 중 알 수 없는 오류 발생: {e}. 건너킵니다.")
                 continue
 
         if email_summary_rows:
@@ -1052,7 +1110,7 @@ if __name__ == '__main__':
                 data = ticker_obj.history(start=START_DATE, end=END_DATE, interval="1d")
 
                 if data.empty or not all(col in data.columns for col in ['Open', 'High', 'Low', 'Close', 'Volume']):
-                    st.warning(f"❌ **{ticker}** 데이터 누락 또는 형식 오류. 건너뜁니다.")
+                    st.warning(f"❌ **{ticker}** 데이터 누락 또는 형식 오류. 건너킵니다.")
                     continue
 
                 if 'Adj Close' in data.columns:
@@ -1070,7 +1128,7 @@ if __name__ == '__main__':
 
                 last = df.iloc[-1]
                 prev_row = df.iloc[-2]
-                prev2_row = df.iloc[-3] if len(df) >= 3 else None # prev2_row 추가
+                prev2_row = df.iloc[-3] if len(df) >= 3 else None
 
                 # 기본 정보 가져오기
                 info = ticker_obj.info
@@ -1080,20 +1138,20 @@ if __name__ == '__main__':
                 debt_to_equity = info.get('debtToEquity', np.nan)
 
                 signal = last['TradeSignal']
-                signal = soften_signal(signal, market_condition) # 거시경제 필터링 적용
-                df.loc[df.index[-1], 'TradeSignal'] = signal # 최종 시그널 업데이트
+                signal = soften_signal(signal, market_condition)
+                df.loc[df.index[-1], 'TradeSignal'] = signal
 
-                score = compute_recommendation_score(last, prev_row, prev2_row, per, market_cap, forward_pe, debt_to_equity) # prev2_row 전달
-                score = adjust_score(score, market_condition) # 거시경제에 따른 점수 조정
+                score = compute_recommendation_score(last, prev_row, prev2_row, per, market_cap, forward_pe, debt_to_equity)
+                score = adjust_score(score, market_condition)
                 action, pct = get_action_and_percentage_by_score(signal, score)
                 
                 # '추천 정도'를 행동에 대한 확신 정도로 변환
-                display_score = get_conviction_score_for_display(signal, score) # 수정된 함수 사용
+                display_score = get_conviction_score_for_display(signal, score)
 
                 summary_rows.append({
                     "Ticker": ticker,
                     "Signal": signal,
-                    "추천정도": f"{display_score:.1f}", # display_score 사용
+                    "추천정도": f"{display_score:.1f}",
                     "추천 행동": action,
                 })
                 all_ticker_data[ticker] = {
@@ -1104,10 +1162,10 @@ if __name__ == '__main__':
                     'score': score,
                     'action': action,
                     'pct': pct,
-                    'per': per, # PER 저장
-                    'market_cap': market_cap, # 시가총액 저장
-                    'forward_pe': forward_pe, # 선행 PER 저장
-                    'debt_to_equity': debt_to_equity # 부채비율 저장
+                    'per': per,
+                    'market_cap': market_cap,
+                    'forward_pe': forward_pe,
+                    'debt_to_equity': debt_to_equity
                 }
 
             except ValueError as ve:
@@ -1125,18 +1183,16 @@ if __name__ == '__main__':
         sorted_sector_scores = sorted(sector_scores.items(), key=lambda item: item[1] if not np.isnan(item[1]) else -1, reverse=True)
 
         # Create columns for horizontal display
-        # Determine number of columns dynamically based on number of non-ETF sectors
-        num_non_etf_sectors = len([s for s in SECTORS if s != "ETF"])
+        num_sectors_to_display = len(sorted_sector_scores)
         
-        # Ensure there's at least one column to avoid error if no non-ETF sectors are defined/valid
-        if num_non_etf_sectors > 0:
-            cols = st.columns(num_non_etf_sectors)
-            col_idx = 0
-            for sector_name, score in sorted_sector_scores:
-                if not np.isnan(score):
-                    with cols[col_idx]:
+        if num_sectors_to_display > 0:
+            cols = st.columns(num_sectors_to_display)
+            for col_idx, (sector_name, score) in enumerate(sorted_sector_scores):
+                with cols[col_idx]:
+                    if not np.isnan(score):
                         st.markdown(f"**{sector_name}**<br>{score:.1f}점", unsafe_allow_html=True)
-                    col_idx += 1 # Move to the next column
+                    else:
+                        st.markdown(f"**{sector_name}**<br>데이터 부족", unsafe_allow_html=True)
         else:
             st.info("섹터별 투자 매력도 데이터를 가져올 수 없습니다.")
         st.markdown("---")
@@ -1150,14 +1206,14 @@ if __name__ == '__main__':
 
         for ticker, data_for_ticker in all_ticker_data.items():
             signal = data_for_ticker['signal']
-            last = data_for_ticker['last'] # last 행 데이터 가져오기
+            last = data_for_ticker['last']
 
             # BB Squeeze Breakout 여부 확인
             is_bb_squeeze_breakout = last.get('BB_Squeeze_Up_Breakout', False) or last.get('BB_Squeeze_Down_Breakout', False)
             
             display_text = f"- {ticker} {get_signal_symbol(signal)} - {TICKER_DESCRIPTIONS.get(ticker, '설명 없음')}"
             if is_bb_squeeze_breakout:
-                display_text += " ⭐" # BB Squeeze Breakout 발생 시 별 이모지 추가
+                display_text += " ⭐"
 
             # 매수 또는 반등 가능성 시그널
             if "매수" in signal or "반등 가능성" in signal:
@@ -1177,7 +1233,6 @@ if __name__ == '__main__':
                 st.markdown("#### ✅ 매수 시그널 종목")
                 if buy_tickers:
                     for t_text in buy_tickers:
-                        # get_signal_symbol 함수가 HTML을 반환하므로 unsafe_allow_html=True 설정
                         st.markdown(t_text, unsafe_allow_html=True)
                 else:
                     st.write("없음")
@@ -1185,7 +1240,6 @@ if __name__ == '__main__':
                 st.markdown("#### 🔻 매도 시그널 종목")
                 if sell_tickers:
                     for t_text in sell_tickers:
-                        # get_signal_symbol 함수가 HTML을 반환하므로 unsafe_allow_html=True 설정
                         st.markdown(t_text, unsafe_allow_html=True)
                 else:
                     st.write("없음")
@@ -1193,7 +1247,6 @@ if __name__ == '__main__':
                 st.markdown("#### 🟡 관망/보유 시그널 종목")
                 if hold_tickers:
                     for t_text in hold_tickers:
-                        # get_signal_symbol 함수가 HTML을 반환하므로 unsafe_allow_html=True 설정
                         st.markdown(t_text, unsafe_allow_html=True)
                 else:
                     st.write("없음")
@@ -1218,6 +1271,10 @@ if __name__ == '__main__':
 
         # --- 각 종목별 상세 지표 및 차트 ---
         for ticker in TICKERS:
+            # ETF는 차트 시각화에서 제외
+            if ticker in ETFS_TO_EXCLUDE_FROM_CHARTS:
+                continue
+            
             if ticker in all_ticker_data:
                 data_for_ticker = all_ticker_data[ticker]
                 df = data_for_ticker['df']
@@ -1225,14 +1282,14 @@ if __name__ == '__main__':
                 signal = data_for_ticker['signal']
                 action = data_for_ticker['action']
                 pct = data_for_ticker['pct']
-                score = data_for_ticker['score'] # 원본 score
-                per = data_for_ticker['per'] # PER 가져오기
-                market_cap = data_for_ticker['market_cap'] # 시가총액 가져오기
-                forward_pe = data_for_ticker['forward_pe'] # 선행 PER 가져오기
-                debt_to_equity = data_for_ticker['debt_to_equity'] # 부채비율 가져오기
+                score = data_for_ticker['score']
+                per = data_for_ticker['per']
+                market_cap = data_for_ticker['market_cap']
+                forward_pe = data_for_ticker['forward_pe']
+                debt_to_equity = data_for_ticker['debt_to_equity']
 
                 # '추천 정도'를 행동에 대한 확신 정도로 변환
-                display_score = get_conviction_score_for_display(signal, score) # 수정된 함수 사용
+                display_score = get_conviction_score_for_display(signal, score)
 
                 # 티커 설명 추가 (추천 행동 위에 위치)
                 st.write(f"**{TICKER_DESCRIPTIONS.get(ticker, '설명 없음')}**")
@@ -1241,7 +1298,7 @@ if __name__ == '__main__':
                 st.markdown(f"{get_signal_symbol(signal)} {get_display_signal_text(signal)}", unsafe_allow_html=True)
                 
                 st.write(f"**추천 행동**: **{action}**")
-                st.write(f"**추천정도**: **{display_score:.1f}/100**") # display_score 사용
+                st.write(f"**추천정도**: **{display_score:.1f}/100**")
 
                 st.markdown("---")
                 st.subheader(f"{ticker} 최근 지표")
