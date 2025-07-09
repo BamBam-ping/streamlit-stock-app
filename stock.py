@@ -65,6 +65,16 @@ TICKER_DESCRIPTIONS = {
     "SCHD": "Schwab U.S. Dividend Equity ETF (미국 고배당주)",
 }
 
+# 섹터 정의 및 해당 티커 매핑
+SECTORS = {
+    "AI/반도체": ["NVDA", "AMD", "PANW", "TSM"],
+    "기술/성장": ["MSFT", "AAPL", "GOOGL", "AMZN", "TSLA", "ADBE", "ORCL"],
+    "헬스케어/제약": ["LLY", "UNH", "VRTX", "REGN", "JNJ"],
+    "금융/결제": ["JPM", "V", "MS", "HOOD"],
+    "ETF": ["SPY", "QQQ", "SCHD"]
+}
+
+
 END_DATE = datetime.now().strftime("%Y-%m-%d")
 START_DATE = (datetime.now() - timedelta(days=730)).strftime("%Y-%m-%d") # 약 2년치 데이터
 MIN_DATA_REQUIRED_FOR_INDICATORS = 180 # 지표 계산에 필요한 최소 일봉 데이터 수
@@ -707,6 +717,30 @@ def get_conviction_score_for_display(signal, raw_score):
         # 이 경우에도 너무 극단적인 점수는 피하도록 범위 제한
         return max(min_conviction_cap, min(max_conviction_cap, raw_score))
 
+# --- 섹터 점수 계산 함수 ---
+def calculate_sector_scores(all_ticker_data, market_condition):
+    """섹터별 점수를 계산합니다. 각 섹터 내 종목들의 평균 점수를 사용하고 시장 상황에 따라 조정합니다."""
+    sector_scores = {}
+    for sector_name, tickers_in_sector in SECTORS.items():
+        total_score = 0
+        count = 0
+        for ticker in tickers_in_sector:
+            if ticker in all_ticker_data:
+                # 개별 종목의 원본 점수(raw_score)를 사용
+                raw_stock_score = all_ticker_data[ticker]['score']
+                total_score += raw_stock_score
+                count += 1
+        
+        if count > 0:
+            avg_sector_score = total_score / count
+            # 섹터 점수도 시장 상황에 따라 조정
+            adjusted_sector_score = adjust_score(avg_sector_score, market_condition)
+            # 점수 범위를 0-100으로 유지
+            sector_scores[sector_name] = max(0, min(100, adjusted_sector_score)) 
+        else:
+            sector_scores[sector_name] = np.nan # 해당 섹터에 데이터가 없을 경우 NaN
+    return sector_scores
+
 # --- ChatGPT 프롬프트 생성 ---
 def generate_chatgpt_prompt(ticker, rsi, macd, macd_hist, signal_line, atr, adx, k_stoch, d_stoch, cci, per, market_cap, forward_pe, debt_to_equity):
     """ChatGPT에 보낼 기술적 지표 프롬프트 문자열을 생성합니다."""
@@ -1038,6 +1072,20 @@ if __name__ == '__main__':
             except Exception as e:
                 st.error(f"❌ **{ticker}** 데이터 처리 중 알 수 없는 오류 발생: **{e}**")
                 st.warning(f"**{ticker}** 시그널 생성을 건너뛰었습니다.")
+
+        # --- 섹터별 점수 현황 ---
+        st.subheader("⭐ 섹터별 투자 매력도")
+        sector_scores = calculate_sector_scores(all_ticker_data, market_condition)
+        
+        # 점수가 높은 순서대로 정렬
+        sorted_sector_scores = sorted(sector_scores.items(), key=lambda item: item[1] if not np.isnan(item[1]) else -1, reverse=True)
+
+        for sector_name, score in sorted_sector_scores:
+            if not np.isnan(score):
+                st.write(f"- **{sector_name}**: {score:.1f}점")
+            else:
+                st.write(f"- **{sector_name}**: 데이터 부족")
+        st.markdown("---")
 
         # --- 매수/매도/관망 종목 목록 표시 ---
         st.subheader("📊 전체 종목별 매매 시그널 현황")
