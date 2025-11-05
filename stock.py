@@ -17,6 +17,7 @@ TICKERS = [
     "AAPL",     # 애플 (기술/성장, 하드웨어, 서비스)
     "NVDA",     # 엔비디아 (기술/초고성장, 반도체, AI)
     "GOOGL",    # 알파벳 (기술/성장, 인터넷 서비스)
+    "META",     # 메타 (기술/성장, 커뮤니케이션)
     "AMZN",     # 아마존 (기술/성장, 이커머스, 클라우드)
     "TSLA",     # 테슬라 (기술/성장, 전기차, AI)
     "PLTR",     # 팔란티어 (기술/성장, AI)
@@ -57,6 +58,7 @@ TICKER_DESCRIPTIONS = {
     "AAPL": "애플 (기술/성장, 하드웨어, 서비스)",
     "NVDA": "엔비디아 (기술/초고성장, 반도체, AI)",
     "GOOGL": "알파벳 (기술/성장, 인터넷 서비스)",
+    "GOOGL": "메타 (기술/성장, 커뮤니케이션)",
     "AMZN": "아마존 (기술/성장, 이커머스, 클라우드)",
     "TSLA": "테슬라 (기술/성장, 전기차, AI)",
     "PLTR": "팔란티어 (기술/성장, AI 보안)",
@@ -1374,4 +1376,5 @@ if __name__ == '__main__':
 
             st.code(full_ai_prompt_content, language='markdown', line_numbers=False)
             st.markdown("👆 위 프롬프트 내용 옆 **'Copy to clipboard' 버튼**을 클릭하여 쉽게 복사할 수 있습니다.")
+
 
