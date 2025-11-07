@@ -58,7 +58,7 @@ TICKER_DESCRIPTIONS = {
     "AAPL": "애플 (기술/성장, 하드웨어, 서비스)",
     "NVDA": "엔비디아 (기술/초고성장, 반도체, AI)",
     "GOOGL": "알파벳 (기술/성장, 인터넷 서비스)",
-    "GOOGL": "메타 (기술/성장, 커뮤니케이션)",
+    "META": "메타 (기술/성장, 커뮤니케이션)",
     "AMZN": "아마존 (기술/성장, 이커머스, 클라우드)",
     "TSLA": "테슬라 (기술/성장, 전기차, AI)",
     "PLTR": "팔란티어 (기술/성장, AI 보안)",
@@ -140,12 +140,12 @@ def download_macro_data(start, end):
         "US3M": "^IRX",      # 미 3개월 국채 금리
         "S&P500": "^GSPC",   # S&P 500 지수
         "NASDAQ": "^IXIC",   # Nasdaq Composite 지수
-        "DXY": "DX-Y.NYB"    # 달러인덱스 (Yahoo Finance 티커)
+        "DXY": "DX=F"    # 달러인덱스 (Yahoo Finance 티커)
     }
     retrieved_data = {}
     
-    # 일일 변화 계산을 위해 최소 2일치 데이터 가져오기
-    fetch_start_date = (datetime.strptime(start, "%Y-%m-%d") - timedelta(days=5)).strftime("%Y-%m-%d") # 충분한 데이터 확보
+    # 일일 변화 계산을 위해 최소 7일치 데이터 가져오기
+    fetch_start_date = (datetime.strptime(start, "%Y-%m-%d") - timedelta(days=7)).strftime("%Y-%m-%d") # 충분한 데이터 확보
 
     for name, ticker_symbol in macro_tickers.items():
         try:
@@ -1376,5 +1376,6 @@ if __name__ == '__main__':
 
             st.code(full_ai_prompt_content, language='markdown', line_numbers=False)
             st.markdown("👆 위 프롬프트 내용 옆 **'Copy to clipboard' 버튼**을 클릭하여 쉽게 복사할 수 있습니다.")
+
 
 
